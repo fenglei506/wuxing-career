@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>五行八卦 · 职业命理分析</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部标题 -->
+        <header class="header">
+            <div class="logo">☯️</div>
+            <h1>五行八卦 · 职业命理</h1>
+            <p class="subtitle">探寻最适合你的职业方向</p>
+        </header>
+
+        <!-- 输入表单 -->
+        <section class="input-section" id="inputSection">
+            <h2>请输入出生信息</h2>
+            
+            <div class="form-group">
+                <label for="birthYear">出生年份</label>
+                <select id="birthYear" class="input-field">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="birthMonth">出生月份</label>
+                <select id="birthMonth" class="input-field">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="birthDay">出生日期</label>
+                <select id="birthDay" class="input-field">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="birthHour">出生时辰</label>
+                <select id="birthHour" class="input-field">
+                    <option value="">请选择</option>
+                    <option value="0">子时 (23:00-00:59)</option>
+                    <option value="1">丑时 (01:00-02:59)</option>
+                    <option value="2">寅时 (03:00-04:59)</option>
+                    <option value="3">卯时 (05:00-06:59)</option>
+                    <option value="4">辰时 (07:00-08:59)</option>
+                    <option value="5">巳时 (09:00-10:59)</option>
+                    <option value="6">午时 (11:00-12:59)</option>
+                    <option value="7">未时 (13:00-14:59)</option>
+                    <option value="8">申时 (15:00-16:59)</option>
+                    <option value="9">酉时 (17:00-18:59)</option>
+                    <option value="10">戌时 (19:00-20:59)</option>
+                    <option value="11">亥时 (21:00-22:59)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="gender">性别</label>
+                <select id="gender" class="input-field">
+                    <option value="">请选择</option>
+                    <option value="男">男</option>
+                    <option value="女">女</option>
+                </select>
+            </div>
+            
+            <button class="submit-btn" id="analyzeBtn" disabled>
+                开始分析
+            </button>
+        </section>
+
+        <!-- 结果展示区 -->
+        <section class="result-section" id="resultSection" style="display: none;">
+            <h2>命理分析结果</h2>
+            
+            <!-- 八字排盘 -->
+            <div class="result-card">
+                <h3>八字四柱</h3>
+                <div class="bazi-grid" id="baziGrid"></div>
+            </div>
+            
+            <!-- 五行分析 -->
+            <div class="result-card">
+                <h3>五行分布</h3>
+                <div class="wuxing-bars" id="wuxingBars"></div>
+                <div class="strength-info" id="strengthInfo"></div>
+            </div>
+            
+            <!-- 性格特质 -->
+            <div class="result-card">
+                <h3>性格特质</h3>
+                <div class="personality-box" id="personalityBox"></div>
+            </div>
+            
+            <!-- 职业推荐 -->
+            <div class="result-card highlight-card">
+                <h3>最适合的职业方向</h3>
+                <div class="career-box" id="careerBox"></div>
+            </div>
+            
+            <!-- 详细分析 -->
+            <div class="result-card">
+                <h3>综合建议</h3>
+                <div class="suggestions-box" id="suggestionsBox"></div>
+            </div>
+            
+            <!-- 支付按钮 -->
+            <div class="payment-section" id="paymentSection" style="display: none;">
+                <p class="payment-tip">想要获取更详细的命理分析报告？</p>
+                <button class="payment-btn" id="paymentBtn">
+                    支付 ¥0.99 获取完整报告
+                </button>
+            </div>
+        </section>
+
+        <!-- 收款码弹窗 -->
+        <div class="modal" id="paymentModal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-btn" id="closeModal">×</span>
+                <h3>请扫码支付 ¥0.99</h3>
+                <div class="qrcode-box">
+                    <img src="placeholder-qr.svg" alt="收款码" class="qrcode-img">
+                </div>
+                <p class="payment-note">支付完成后，请联系客服获取完整报告</p>
+                <p class="payment-contact">客服微信：XXXXX</p>
+            </div>
+        </div>
+
+        <!-- 底部 -->
+        <footer class="footer">
+            <p>本分析基于传统命理学规则框架，仅供参考和自我探索</p>
+        </footer>
+    </div>
+
+    <script src="bazi.js"></script>
+    <script src="career.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

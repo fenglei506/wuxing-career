@@ -1,0 +1,443 @@
+/* 五行八卦职业命理 - 简约移动端样式 */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: #e8e8e8;
+    min-height: 100vh;
+    padding: 0;
+}
+
+.container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px 16px;
+}
+
+/* 顶部标题 */
+.header {
+    text-align: center;
+    padding: 30px 0 20px;
+}
+
+.logo {
+    font-size: 48px;
+    margin-bottom: 10px;
+    animation: rotate 10s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #a8a8a8;
+}
+
+/* 输入表单 */
+.input-section {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 24px 20px;
+    margin: 20px 0;
+}
+
+.input-section h2 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    color: #b8b8b8;
+    margin-bottom: 8px;
+}
+
+.input-field {
+    width: 100%;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 16px;
+    color: #fff;
+    appearance: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: #4a90d9;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.input-field option {
+    background: #1a1a2e;
+    color: #fff;
+}
+
+.submit-btn {
+    width: 100%;
+    height: 52px;
+    background: linear-gradient(135deg, #4a90d9 0%, #357abd 100%);
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 500;
+    color: #fff;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: all 0.3s;
+}
+
+.submit-btn:disabled {
+    background: rgba(255, 255, 255, 0.2);
+    cursor: not-allowed;
+}
+
+.submit-btn:not(:disabled):active {
+    transform: scale(0.98);
+}
+
+/* 结果展示 */
+.result-section {
+    margin: 20px 0;
+}
+
+.result-section h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.result-card {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px 16px;
+    margin-bottom: 16px;
+}
+
+.result-card h3 {
+    font-size: 16px;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.highlight-card {
+    background: linear-gradient(135deg, rgba(74, 144, 217, 0.2) 0%, rgba(53, 122, 189, 0.15) 100%);
+    border: 1px solid rgba(74, 144, 217, 0.3);
+}
+
+.highlight-card h3 {
+    color: #4a90d9;
+    border-bottom-color: rgba(74, 144, 217, 0.3);
+}
+
+/* 八字排盘 */
+.bazi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.bazi-column {
+    text-align: center;
+}
+
+.bazi-column .label {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 6px;
+}
+
+.bazi-column .stem {
+    font-size: 28px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.bazi-column .branch {
+    font-size: 28px;
+    font-weight: 600;
+    color: #4a90d9;
+}
+
+/* 五行分布 */
+.wuxing-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wuxing-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wuxing-bar .name {
+    width: 40px;
+    font-size: 14px;
+    text-align: right;
+}
+
+.wuxing-bar .bar-container {
+    flex: 1;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    position: relative;
+}
+
+.wuxing-bar .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s;
+}
+
+.wuxing-bar .bar-fill.gold { background: linear-gradient(90deg, #ffd700, #ffb347); }
+.wuxing-bar .bar-fill.water { background: linear-gradient(90deg, #1e90ff, #00bfff); }
+.wuxing-bar .bar-fill.wood { background: linear-gradient(90deg, #228b22, #32cd32); }
+.wuxing-bar .bar-fill.fire { background: linear-gradient(90deg, #ff4500, #ff6b6b); }
+.wuxing-bar .bar-fill.earth { background: linear-gradient(90deg, #8b4513, #d2691e); }
+
+.wuxing-bar .count {
+    width: 30px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.strength-info {
+    margin-top: 16px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.strength-info .strength-label {
+    font-size: 16px;
+    font-weight: 500;
+    color: #4a90d9;
+}
+
+.strength-info .strength-desc {
+    font-size: 14px;
+    color: #b8b8b8;
+    margin-top: 4px;
+}
+
+/* 性格特质 */
+.personality-box {
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.personality-box .trait-item {
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.personality-box .trait-item:last-child {
+    margin-bottom: 0;
+}
+
+/* 职业推荐 */
+.career-box {
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.career-box .career-main {
+    font-size: 18px;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 16px;
+}
+
+.career-box .career-list {
+    margin-bottom: 16px;
+}
+
+.career-box .career-list h4 {
+    font-size: 14px;
+    color: #b8b8b8;
+    margin-bottom: 8px;
+}
+
+.career-box .career-list ul {
+    list-style: none;
+}
+
+.career-box .career-list li {
+    padding: 6px 0;
+    color: #e8e8e8;
+}
+
+.career-box .career-list li::before {
+    content: "▸ ";
+    color: #4a90d9;
+}
+
+/* 综合建议 */
+.suggestions-box {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.suggestions-box .suggestion-item {
+    margin-bottom: 8px;
+    padding-left: 16px;
+}
+
+/* 支付部分 */
+.payment-section {
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 20px;
+}
+
+.payment-tip {
+    font-size: 14px;
+    color: #b8b8b8;
+    margin-bottom: 16px;
+}
+
+.payment-btn {
+    width: 100%;
+    height: 52px;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.payment-btn:active {
+    transform: scale(0.98);
+}
+
+/* 弹窗 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #1a1a2e;
+    border-radius: 20px;
+    padding: 30px 24px;
+    width: 90%;
+    max-width: 360px;
+    text-align: center;
+}
+
+.close-btn {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 28px;
+    color: #888;
+    cursor: pointer;
+}
+
+.modal-content h3 {
+    font-size: 18px;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.qrcode-box {
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.qrcode-img {
+    width: 200px;
+    height: 200px;
+}
+
+.payment-note {
+    font-size: 14px;
+    color: #b8b8b8;
+    margin-bottom: 8px;
+}
+
+.payment-contact {
+    font-size: 16px;
+    color: #4a90d9;
+    font-weight: 500;
+}
+
+/* 底部 */
+.footer {
+    text-align: center;
+    padding: 20px 0;
+    font-size: 12px;
+    color: #888;
+}
+
+/* 加载动画 */
+.loading {
+    text-align: center;
+    padding: 40px;
+}
+
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #4a90d9;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
