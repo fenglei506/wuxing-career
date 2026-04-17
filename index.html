@@ -17,7 +17,8 @@
 
         <!-- 输入表单 -->
         <section class="input-section" id="inputSection">
-            <h2>请输入出生信息</h2>
+            <h2>请输入出生信息 <span style="color:#e74c3c;font-size:0.9em;">（阳历/公历）</span></h2>
+            <p style="color:#888;font-size:0.85em;margin-bottom:15px;">⚠️ 请使用阳历（公历）生日，如身份证上的日期</p>
             
             <div class="form-group">
                 <label for="birthYear">出生年份</label>
@@ -125,8 +126,8 @@
                 <div class="qrcode-box">
                     <img src="payment-qrcode.png" alt="收款码" class="qrcode-img">
                 </div>
-                <p class="payment-note">支付完成后，请联系客服获取完整报告</p>
-                <p class="payment-contact">客服微信：XXXXX</p>
+                <p class="payment-note">支付完成后请点击下方按钮</p>
+                <button class="confirm-payment-btn" id="confirmPaymentBtn" style="width:100%;margin-top:15px;padding:12px;background:#52c41a;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer;">✅ 我已完成支付，查看完整报告</button>
             </div>
         </div>
 

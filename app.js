@@ -112,6 +112,9 @@ function bindEvents() {
     // 支付按钮
     document.getElementById('paymentBtn').addEventListener('click', showPaymentModal);
     
+    // 支付完成按钮
+    document.getElementById('confirmPaymentBtn').addEventListener('click', showFullReport);
+    
     // 关闭弹窗
     document.getElementById('closeModal').addEventListener('click', hidePaymentModal);
     
@@ -378,4 +381,65 @@ function showPaymentModal() {
  */
 function hidePaymentModal() {
     document.getElementById('paymentModal').style.display = 'none';
+}
+
+/**
+ * 显示完整报告（支付完成后）
+ */
+function showFullReport() {
+    hidePaymentModal();
+    
+    // 隐藏支付按钮，显示完整报告
+    document.getElementById('paymentSection').style.display = 'none';
+    
+    // 获取当前分析数据
+    const year = parseInt(document.getElementById('birthYear').value);
+    const month = parseInt(document.getElementById('birthMonth').value);
+    const day = parseInt(document.getElementById('birthDay').value);
+    const hour = parseInt(document.getElementById('birthHour').value);
+    const gender = document.getElementById('gender').value;
+    
+    // 计算完整分析
+    const bazi = calculateBazi(year, month, day, hour);
+    const elements = calculateElements(bazi);
+    const strength = calculateStrength(elements, bazi, gender);
+    const career = analyzeCareer(elements, strength, gender);
+    
+    // 添加完整报告卡片
+    const resultSection = document.getElementById('resultSection');
+    
+    // 添加详细职业分析
+    const detailedCard = document.createElement('div');
+    detailedCard.className = 'result-card highlight-card';
+    detailedCard.innerHTML = `
+        <h3>🎯 详细职业分析报告</h3>
+        <div class="detailed-analysis">
+            <h4>最佳职业匹配 TOP 5</h4>
+            <ul style="list-style:none;padding:0;">
+                ${career.topJobs.map((job, i) => `<li style="margin:10px 0;padding:10px;background:#f6f8fa;border-radius:8px;">
+                    <strong style="color:#1890ff;">${i+1}. ${job.name}</strong>
+                    <p style="margin:5px 0;color:#666;">匹配度：${job.score}%</p>
+                    <p style="margin:5px 0;color:#888;font-size:0.9em;">${job.reason}</p>
+                </li>`).join('')}
+            </ul>
+            
+            <h4 style="margin-top:20px;">💡 职业发展建议</h4>
+            <p style="color:#666;line-height:1.8;">${career.developmentAdvice}</p>
+            
+            <h4 style="margin-top:20px;">⚠️ 需注意的行业</h4>
+            <p style="color:#e74c3c;line-height:1.8;">${career.avoidIndustries}</p>
+            
+            <h4 style="margin-top:20px;">📅 未来3年运势走向</h4>
+            <p style="color:#666;line-height:1.8;">${career.futureTrend}</p>
+        </div>
+    `;
+    resultSection.appendChild(detailedCard);
+    
+    // 显示成功提示
+    const successTip = document.createElement('div');
+    successTip.className = 'result-card';
+    successTip.style.background = '#f6ffed';
+    successTip.style.border = '1px solid #b7eb8f';
+    successTip.innerHTML = '<p style="color:#52c41a;text-align:center;font-size:18px;">✅ 支付成功！完整报告已解锁</p>';
+    resultSection.insertBefore(successTip, resultSection.firstChild);
 }
