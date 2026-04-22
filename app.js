@@ -400,10 +400,13 @@ function showFullReport() {
     const gender = document.getElementById('gender').value;
     
     // 计算完整分析
-    const bazi = calculateBazi(year, month, day, hour);
-    const elements = calculateElements(bazi);
-    const strength = calculateStrength(elements, bazi, gender);
-    const career = analyzeCareer(elements, strength, gender);
+    const bazi = BaziEngine.getFullBazi(year, month, day, hour);
+    const elements = BaziEngine.countElements(bazi);
+    const strength = BaziEngine.analyzeStrength(bazi, elements);
+    const career = CareerEngine.analyzeCareer(bazi, strength, elements);
+    
+    // 生成详细报告数据
+    const detailedReport = generateDetailedReport(career, bazi, elements);
     
     // 添加完整报告卡片
     const resultSection = document.getElementById('resultSection');
@@ -416,7 +419,7 @@ function showFullReport() {
         <div class="detailed-analysis">
             <h4>最佳职业匹配 TOP 5</h4>
             <ul style="list-style:none;padding:0;">
-                ${career.topJobs.map((job, i) => `<li style="margin:10px 0;padding:10px;background:#f6f8fa;border-radius:8px;">
+                ${detailedReport.topJobs.map((job, i) => `<li style="margin:10px 0;padding:10px;background:#f6f8fa;border-radius:8px;">
                     <strong style="color:#1890ff;">${i+1}. ${job.name}</strong>
                     <p style="margin:5px 0;color:#666;">匹配度：${job.score}%</p>
                     <p style="margin:5px 0;color:#888;font-size:0.9em;">${job.reason}</p>
@@ -424,13 +427,13 @@ function showFullReport() {
             </ul>
             
             <h4 style="margin-top:20px;">💡 职业发展建议</h4>
-            <p style="color:#666;line-height:1.8;">${career.developmentAdvice}</p>
+            <p style="color:#666;line-height:1.8;">${detailedReport.developmentAdvice}</p>
             
             <h4 style="margin-top:20px;">⚠️ 需注意的行业</h4>
-            <p style="color:#e74c3c;line-height:1.8;">${career.avoidIndustries}</p>
+            <p style="color:#e74c3c;line-height:1.8;">${detailedReport.avoidIndustries}</p>
             
             <h4 style="margin-top:20px;">📅 未来3年运势走向</h4>
-            <p style="color:#666;line-height:1.8;">${career.futureTrend}</p>
+            <p style="color:#666;line-height:1.8;">${detailedReport.futureTrend}</p>
         </div>
     `;
     resultSection.appendChild(detailedCard);
@@ -443,3 +446,53 @@ function showFullReport() {
     successTip.innerHTML = '<p style="color:#52c41a;text-align:center;font-size:18px;">✅ 支付成功！完整报告已解锁</p>';
     resultSection.insertBefore(successTip, resultSection.firstChild);
 }
+
+/**
+ * 生成详细报告数据
+ */
+function generateDetailedReport(career, bazi, elements) {
+    const dayMaster = bazi.dayMaster;
+    const dayElement = ELEMENTS[dayMaster];
+    
+    // 基于五行和职业信息生成TOP5
+    const topJobs = career.careerInfo.roles.slice(0, 5).map((role, idx) => {
+        const scores = [95, 88, 82, 76, 70];
+        const reasons = [
+            `与${career.dominantElement}属性高度契合，发挥天赋优势`,
+            `符合日主${dayMaster}的性格特质，自然适应`,
+            `五行${career.dominantElement}旺，行业能量加持`,
+            `性格${career.personality.trait}型，工作风格匹配`,
+            `综合命理分析，有发展潜力`
+        ];
+        return {
+            name: role,
+            score: scores[idx],
+            reason: reasons[idx]
+        };
+    });
+    
+    // 职业发展建议
+    const developmentAdvice = `${career.template.direction}的职业路线最适合您。${career.template.advice}建议在${career.dominantElement}相关行业深耕，选择${career.careerInfo.industries[0]}或${career.careerInfo.industries[1]}方向作为长期发展目标。发挥${career.personality.keywords.slice(0, 2).join('、')}的优势，在工作中展现${career.careerInfo.traits.slice(0, 2).join('与')}的特质。`;
+    
+    // 需避免的行业（与旺五行相克的行业）
+    const克五行 = { '金': '火', '水': '土', '木': '金', '火': '水', '土': '木' };
+    const avoidElement = 克五行[career.dominantElement];
+    const avoidIndustries = `建议谨慎进入${avoidElement}属性过强的行业，如${CareerEngine.ELEMENT_CAREERS[avoidElement]?.industries.slice(0, 3).join('、') || '相关行业'}。这些领域可能与您的命理特质存在冲突，容易消耗精力或难以发挥优势。`;
+    
+    // 未来运势（基于当前年份）
+    const currentYear = new Date().getFullYear();
+    const yearStemIdx = (currentYear - 3) % 10;
+    const yearStem = STEMS[yearStemIdx];
+    const yearElement = ELEMENTS[yearStem];
+    const isFavorable = yearElement === career.dominantElement || 
+                        yearElement === dayElement ||
+                        (career.personality.keywords.some(k => k.includes(yearElement)));
+    
+    const futureTrend = `${currentYear}年（${yearStem}${yearElement}年）${isFavorable ? '运势向好' : '运势平稳'}。${isFavorable ? '五行能量加持，适合把握机会开拓进取。' : '稳中求进，宜巩固基础、积累经验。'}未来三年建议专注${career.dominantElement}行业的发展，${career.template.direction === '主动出击型' ? '可尝试突破性转型或创业尝试' : '宜在现有领域深耕，稳步提升专业能力'}。`;
+    
+    return {
+        topJobs,
+        developmentAdvice,
+        avoidIndustries,
+        futureTrend
+    };
