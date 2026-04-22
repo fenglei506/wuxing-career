@@ -496,3 +496,4 @@ function generateDetailedReport(career, bazi, elements) {
         avoidIndustries,
         futureTrend
     };
+}
