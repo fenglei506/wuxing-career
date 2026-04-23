@@ -631,8 +631,8 @@ function generateDetailedReport(career, bazi, elements) {
     const developmentAdvice = `${career.template.direction}的职业路线最适合您。${career.template.advice}建议在${career.dominantElement}相关行业深耕，选择${career.careerInfo.industries[0]}或${career.careerInfo.industries[1]}方向作为长期发展目标。发挥${career.personality.keywords.slice(0, 2).join('、')}的优势，在工作中展现${career.careerInfo.traits.slice(0, 2).join('与')}的特质。`;
     
     // 需避免的行业（与旺五行相克的行业）
-    const克五行 = { '金': '火', '水': '土', '木': '金', '火': '水', '土': '木' };
-    const avoidElement = 克五行[career.dominantElement];
+    var keWuxing = { '金': '火', '水': '土', '木': '金', '火': '水', '土': '木' };
+    var avoidElement = keWuxing[career.dominantElement];
     const avoidIndustries = `建议谨慎进入${avoidElement}属性过强的行业，如${CareerEngine.ELEMENT_CAREERS[avoidElement]?.industries.slice(0, 3).join('、') || '相关行业'}。这些领域可能与您的命理特质存在冲突，容易消耗精力或难以发挥优势。`;
     
     // 未来运势（基于当前年份）
