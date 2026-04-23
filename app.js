@@ -4,6 +4,19 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // 诊断：检查库加载状态
+    console.log('=== 库加载状态检查 ===');
+    console.log('Solar:', typeof window.Solar);
+    console.log('Lunar:', typeof window.Lunar);
+    console.log('LunarConverter:', typeof window.LunarConverter);
+    console.log('BaziEngine:', typeof window.BaziEngine);
+    console.log('CareerEngine:', typeof window.CareerEngine);
+    
+    if (typeof window.Solar === 'undefined') {
+        alert('农历库加载失败！请刷新页面或检查网络。');
+        return;
+    }
+    
     // 初始化下拉选项
     initSelectOptions();
     
@@ -170,25 +183,44 @@ function bindEvents() {
  * 开始分析
  */
 function startAnalysis() {
-    const dateType = document.getElementById('dateType').value;
-    const year = parseInt(document.getElementById('birthYear').value);
-    const month = parseInt(document.getElementById('birthMonth').value);
-    const day = parseInt(document.getElementById('birthDay').value);
-    const hour = parseInt(document.getElementById('birthHour').value);
-    const gender = document.getElementById('gender').value;
-    
-    // 根据日期类型转换为阳历
-    let solarYear, solarMonth, solarDay;
-    let lunarInfo = null;
-    let solarInfo = null;
-    
-    if (dateType === 'lunar') {
-        // 农历输入，转换为阳历
-        const solar = LunarConverter.lunarToSolar(year, month, day);
-        solarYear = solar.year;
-        solarMonth = solar.month;
-        solarDay = solar.day;
-        lunarInfo = { year, month, day, name: LunarConverter.getLunarYearPillar(year).name + ' ' + month + '月' + day + '日' };
+    try {
+        console.log('=== startAnalysis 开始 ===');
+        
+        const dateType = document.getElementById('dateType').value;
+        const year = parseInt(document.getElementById('birthYear').value);
+        const month = parseInt(document.getElementById('birthMonth').value);
+        const day = parseInt(document.getElementById('birthDay').value);
+        const hour = parseInt(document.getElementById('birthHour').value);
+        const gender = document.getElementById('gender').value;
+        
+        console.log('输入参数:', {dateType, year, month, day, hour, gender});
+        
+        // 检查库是否加载
+        if (typeof LunarConverter === 'undefined') {
+            alert('错误：LunarConverter未加载！');
+            return;
+        }
+        if (typeof BaziEngine === 'undefined') {
+            alert('错误：BaziEngine未加载！');
+            return;
+        }
+        if (typeof CareerEngine === 'undefined') {
+            alert('错误：CareerEngine未加载！');
+            return;
+        }
+        
+        // 根据日期类型转换为阳历
+        let solarYear, solarMonth, solarDay;
+        let lunarInfo = null;
+        let solarInfo = null;
+        
+        if (dateType === 'lunar') {
+            // 农历输入，转换为阳历
+            const solar = LunarConverter.lunarToSolar(year, month, day);
+            solarYear = solar.year;
+            solarMonth = solar.month;
+            solarDay = solar.day;
+            lunarInfo = { year, month, day, name: LunarConverter.getLunarYearPillar(year).name + ' ' + month + '月' + day + '日' };
         solarInfo = { year: solarYear, month: solarMonth, day: solarDay, name: solarYear + '年' + solarMonth + '月' + solarDay + '日' };
     } else {
         // 阳历输入，转换为农历
@@ -231,6 +263,11 @@ function startAnalysis() {
             console.error(error);
         }
     }, 500);
+    
+    } catch (error) {
+        alert('分析过程出错: ' + error.message);
+        console.error('startAnalysis 错误:', error);
+    }
 }
 
 /**
