@@ -600,7 +600,7 @@ function getDefaultDaYun(bazi) {
             isUseful: false,
             isAvoid: false,
             rating: '平稳',
-            desc: `${stem}${branch}大运 (${startAge}-${endAge}岁)
+            desc: `${stem}${branch}大运 (${startAge}-${endAge}岁)`
         });
     }
     
