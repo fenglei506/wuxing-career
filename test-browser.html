@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>浏览器测试</title>
+</head>
+<body>
+    <h2>浏览器环境测试</h2>
+    <div id="result"></div>
+    
+    <!-- 模拟实际加载顺序 -->
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.12/lunar.min.js"></script>
+    <script src="bazi.js"></script>
+    <script src="career.js"></script>
+    <script src="lunar.js"></script>
+    <script>
+        const resultDiv = document.getElementById('result');
+        
+        // 检查所有库
+        resultDiv.innerHTML = `
+            <p>Solar: ${typeof Solar}</p>
+            <p>Lunar: ${typeof Lunar}</p>
+            <p>LunarConverter: ${typeof LunarConverter}</p>
+            <p>BaziEngine: ${typeof BaziEngine}</p>
+            <p>CareerEngine: ${typeof CareerEngine}</p>
+            <hr>
+        `;
+        
+        // 测试功能
+        if (typeof LunarConverter !== 'undefined') {
+            try {
+                const result = LunarConverter.solarToLunar(1980, 4, 27);
+                resultDiv.innerHTML += `<p style="color:green">✅ solarToLunar 成功: ${result.fullName}</p>`;
+            } catch(e) {
+                resultDiv.innerHTML += `<p style="color:red">❌ 错误: ${e.message}</p>`;
+            }
+        } else {
+            resultDiv.innerHTML += `<p style="color:red">❌ LunarConverter 未定义</p>`;
+        }
+    </script>
+</body>
+</html>

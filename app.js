@@ -530,13 +530,12 @@ function showFullReport() {
     const bazi = BaziEngine.getFullBazi(solarYear, solarMonth, solarDay, hour);
     const elements = BaziEngine.countElements(bazi);
     const strength = BaziEngine.analyzeStrength(bazi, elements);
-    const career = CareerEngine.analyzeCareer(bazi, strength, elements);
     
-    // 生成详细报告
-    const detailedReport = generateDetailedReport(career, bazi, elements, gender);
+    // 计算大运
+    const daYun = BaziEngine.calculateDaYun(bazi, solarYear, solarMonth, solarDay, hour, gender);
     
-    // 添加完整报告卡片
-    const resultSection = document.getElementById('resultSection');
+    // 六维度分析
+    const destiny = CareerEngine.analyzeDestiny(bazi, strength.detail, elements, gender);
     
     // 清空原有内容，重新渲染完整报告
     resultSection.innerHTML = `
@@ -547,191 +546,354 @@ function showFullReport() {
             <p style="color:#52c41a;text-align:center;font-size:18px;margin:0;">✅ 报告已解锁！以下是详细分析内容</p>
         </div>
         
+        <!-- 前置声明 -->
+        <div class="result-card" style="background:#fffbe6;border:1px solid #ffe58f;">
+            <p style="color:#d48806;text-align:center;margin:0;font-size:14px;">本分析为文化娱乐参考，非专业决策依据，具体发展需结合个人努力与客观环境。</p>
+        </div>
+        
         <!-- 基础信息 -->
         <div class="result-card">
             <h3>📋 基础信息</h3>
-            <div class="info-grid">
-                <p><strong>阳历：</strong>${solarYear}年${solarMonth}月${solarDay}日</p>
+            <div class="info-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+                <p><strong>阳历：</strong>${solarYear}年${solarMonth}月${solarDay}日 ${['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][hour]}时</p>
                 <p><strong>农历：</strong>${dateType === 'lunar' ? LunarConverter.getLunarYearPillar(year).name + ' ' + month + '月' + day + '日' : LunarConverter.solarToLunar(solarYear, solarMonth, solarDay).fullName}</p>
-                <p><strong>性别：</strong>${gender}</p>
-                <p><strong>时辰：</strong>${['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][hour]}时</p>
+                <p><strong>性别：</strong>${gender === 'male' ? '男命' : '女命'}</p>
+                <p><strong>年龄：</strong>${new Date().getFullYear() - solarYear}岁（虚岁）</p>
             </div>
         </div>
         
-        <!-- 八字四柱详解 -->
+        <!-- 命盘技法解读 -->
         <div class="result-card">
-            <h3>🔮 八字四柱详解</h3>
-            <div class="bazi-detail">
-                ${generateBaziDetail(bazi)}
-            </div>
+            <h3>1. 命盘技法解读</h3>
+            ${generateBaziTechnique(bazi, strength, elements)}
         </div>
         
-        <!-- 五行分析 -->
+        <!-- 命盘事项解读 -->
         <div class="result-card">
-            <h3>⭐ 五行能量分析</h3>
-            ${generateElementAnalysis(elements, strength)}
+            <h3>2. 命盘事项解读</h3>
+            ${generateAspectsDetail(destiny)}
         </div>
         
-        <!-- 十神分析 -->
+        <!-- 大运流年走势 -->
         <div class="result-card">
-            <h3>🎭 十神性格分析</h3>
-            ${generateShishenAnalysis(bazi)}
+            <h3>3. 大运流年走势解读</h3>
+            ${generateDaYunAnalysis(daYun, bazi)}
         </div>
         
-        <!-- 详细职业分析 -->
-        <div class="result-card highlight-card">
-            <h3>🎯 详细职业分析报告</h3>
-            ${generateCareerDetail(detailedReport)}
-        </div>
-        
-        <!-- 开运建议 -->
+        <!-- 核心建议与风险规避 -->
         <div class="result-card">
-            <h3>🌈 开运指南</h3>
-            ${generateFortuneGuide(career, bazi)}
-        </div>
-        
-        <!-- 未来运势 -->
-        <div class="result-card">
-            <h3>📅 未来三年运势展望</h3>
-            ${generateFutureTrend(bazi, career)}
+            <h3>4. 核心建议与风险规避</h3>
+            ${generateCoreAdvice(destiny, bazi)}
         </div>
         
         <!-- 免责声明 -->
         <div class="result-card" style="background:#fffbe6;border:1px solid #ffe58f;">
-            <p style="color:#d48806;font-size:0.85em;text-align:center;margin:0;">⚠️ 本报告基于传统命理学规则框架，仅供娱乐和自我探索参考，不构成人生决策建议</p>
+            <p style="color:#d48806;font-size:0.85em;text-align:center;margin:0;">⚠️ 本分析完全基于您提供的命盘信息，命理是趋势的推演，人生的画卷最终由您的每一个选择与行动绘就。若有其他具体疑问，可随时提出。</p>
         </div>
     `;
 }
 
 /**
- * 生成详细报告数据
+ * 生成命盘技法解读（专业版）
  */
-function generateDetailedReport(career, bazi, elements) {
+function generateBaziTechnique(bazi, strength, elements) {
     const dayMaster = bazi.dayMaster;
     const dayElement = ELEMENTS[dayMaster];
+    const tenGods = bazi.tenGods;
+    const pattern = bazi.pattern;
+    const usefulGod = bazi.usefulGod;
     
-    // 基于五行和职业信息生成TOP5
-    const topJobs = career.careerInfo.roles.slice(0, 5).map((role, idx) => {
-        const scores = [95, 88, 82, 76, 70];
-        const reasons = [
-            `与${career.dominantElement}属性高度契合，发挥天赋优势`,
-            `符合日主${dayMaster}的性格特质，自然适应`,
-            `五行${career.dominantElement}旺，行业能量加持`,
-            `性格${career.personality.trait}型，工作风格匹配`,
-            `综合命理分析，有发展潜力`
-        ];
-        return {
-            name: role,
-            score: scores[idx],
-            reason: reasons[idx]
-        };
-    });
+    // 八字排盘
+    const baziStr = `${bazi.year.stem}${bazi.year.branch} ${bazi.month.stem}${bazi.month.branch} ${bazi.day.stem}${bazi.day.branch} ${bazi.hour.stem}${bazi.hour.branch}`;
     
-    // 职业发展建议
-    const developmentAdvice = `${career.template.direction}的职业路线最适合您。${career.template.advice}建议在${career.dominantElement}相关行业深耕，选择${career.careerInfo.industries[0]}或${career.careerInfo.industries[1]}方向作为长期发展目标。发挥${career.personality.keywords.slice(0, 2).join('、')}的优势，在工作中展现${career.careerInfo.traits.slice(0, 2).join('与')}的特质。`;
+    // 十神一览（带解释）
+    const tenGodsHtml = `
+        <div style="background:#f6f8fa;padding:15px;border-radius:8px;margin:10px 0;">
+            <strong>十神一览：</strong>
+            <ul style="margin:10px 0;padding-left:20px;line-height:2;">
+                <li><strong>年柱：</strong>${tenGods.yearStem}（${bazi.year.stem}${bazi.year.branch}）
+                    <span style="color:#888;font-size:0.85em;">${BaziEngine.TEN_GODS_INFO[tenGods.yearStem]?.desc || ''}</span></li>
+                <li><strong>月柱：</strong>${tenGods.monthStem}（${bazi.month.stem}${bazi.month.branch}）
+                    <span style="color:#888;font-size:0.85em;">${BaziEngine.TEN_GODS_INFO[tenGods.monthStem]?.desc || ''}</span></li>
+                <li><strong>日柱：</strong>日主（${bazi.day.stem}${bazi.day.branch}）
+                    <span style="color:#888;font-size:0.85em;">代表自己</span></li>
+                <li><strong>时柱：</strong>${tenGods.hourStem}（${bazi.hour.stem}${bazi.hour.branch}）
+                    <span style="color:#888;font-size:0.85em;">${BaziEngine.TEN_GODS_INFO[tenGods.hourStem]?.desc || ''}</span></li>
+            </ul>
+            <p style="color:#d48806;font-size:0.8em;margin-top:10px;">📌 <strong>术语解释：</strong>十神是八字命理的核心概念，描述日主与其他天干的关系。如<strong>比肩</strong>代表兄弟姐妹、自我意识；<strong>食神</strong>代表才华、子女；<strong>偏财</strong>代表意外之财、父亲等。</p>
+        </div>
+    `;
     
-    // 需避免的行业（与旺五行相克的行业）
-    var keWuxing = { '金': '火', '水': '土', '木': '金', '火': '水', '土': '木' };
-    var avoidElement = keWuxing[career.dominantElement];
-    const avoidIndustries = `建议谨慎进入${avoidElement}属性过强的行业，如${CareerEngine.ELEMENT_CAREERS[avoidElement]?.industries.slice(0, 3).join('、') || '相关行业'}。这些领域可能与您的命理特质存在冲突，容易消耗精力或难以发挥优势。`;
+    // 五行旺衰分析
+    const sortedElements = Object.entries(elements).sort((a, b) => b[1] - a[1]);
+    const dominantElement = sortedElements[0][0];
+    const weakestElement = sortedElements[sortedElements.length - 1][0];
     
-    // 未来运势（基于当前年份）
+    const elementHtml = `
+        <div style="background:#e6f7ff;padding:15px;border-radius:8px;margin:10px 0;">
+            <strong>五行旺衰：</strong>日主${dayMaster}属${dayElement}，生于${bazi.month.branch}月（${BRANCH_ELEMENTS[bazi.month.branch]}季）。
+            <p style="margin:10px 0;">五行分布：${sortedElements.map(([e, c]) => `${e}(${Math.round(c)}分)`).join(' → ')}</p>
+            <p>综合判为<strong style="color:${strength.strength.includes('强') ? '#52c41a' : '#ff4d4f'};">${strength.strength}</strong>。
+            <span style="color:#888;">${strength.detail?.strengthDesc || ''}</span></p>
+            <p style="color:#d48806;font-size:0.8em;margin-top:10px;">📌 <strong>术语解释：</strong><strong>身强</strong>指日主力量充沛，能承受财官（财富和职位）；<strong>身弱</strong>指日主力量不足，需要印星（贵人、学历）和比劫（朋友、兄弟）帮扶。</p>
+        </div>
+    `;
+    
+    // 格局分析
+    const patternHtml = `
+        <div style="background:#fffbe6;padding:15px;border-radius:8px;margin:10px 0;">
+            <strong>格局分析：</strong>${pattern.name}
+            <p style="margin:10px 0;color:#666;">${pattern.desc}</p>
+            <p style="color:#d48806;font-size:0.8em;margin-top:10px;">📌 <strong>术语解释：</strong><strong>格局</strong>是八字命理判断层次和命运走向的重要依据。如<strong>食神格</strong>主才华外露，适合技艺创作；<strong>正官格</strong>主正直守法，适合仕途管理。</p>
+        </div>
+    `;
+    
+    // 喜用忌神
+    const usefulGodHtml = `
+        <div style="background:#f6ffed;padding:15px;border-radius:8px;margin:10px 0;">
+            <strong>喜用忌神：</strong>
+            <div style="margin:10px 0;">
+                <span style="background:#52c41a;color:#fff;padding:4px 8px;border-radius:4px;margin-right:5px;">喜用：${usefulGod.useful.join('、')}</span>
+                <span style="background:#ff4d4f;color:#fff;padding:4px 8px;border-radius:4px;">忌神：${usefulGod.avoid.join('、') || '无明显忌神'}</span>
+            </div>
+            <p style="color:#666;margin:10px 0;">${usefulGod.usefulDesc}</p>
+            <p style="color:#888;">${usefulGod.avoidDesc}</p>
+            <p style="color:#d48806;font-size:0.8em;margin-top:10px;">📌 <strong>术语解释：</strong><strong>喜用神</strong>是对命主有益的五行，能增强运势；<strong>忌神</strong>是对命主不利的五行，会带来阻碍。通过补益喜用、规避忌神，可改善命运走向。</p>
+        </div>
+    `;
+    
+    return `
+        <div style="font-size:16px;font-weight:bold;margin-bottom:15px;">八字排盘：${baziStr}</div>
+        ${tenGodsHtml}
+        ${elementHtml}
+        ${patternHtml}
+        ${usefulGodHtml}
+    `;
+}
+
+/**
+ * 生成命盘事项解读（六维度）
+ */
+function generateAspectsDetail(destiny) {
+    const aspects = destiny.aspects;
+    
+    // 事业
+    const careerHtml = `
+        <div style="margin:15px 0;padding:15px;background:#f6f8fa;border-radius:12px;border-left:4px solid #1890ff;">
+            <h4 style="color:#1890ff;margin:0 0 10px;">💼 事业</h4>
+            <p><strong>职业倾向：</strong>${aspects.career.type}</p>
+            <p style="color:#666;">${aspects.career.detail}</p>
+            <p><strong>适配职位：</strong>${aspects.career.suitableJobs.join('、')}</p>
+            <p><strong>建议：</strong>${aspects.career.advice}</p>
+            <p style="color:#d48806;font-size:0.8em;margin-top:10px;">${aspects.career.warning}</p>
+        </div>
+    `;
+    
+    // 财运
+    const wealthHtml = `
+        <div style="margin:15px 0;padding:15px;background:#fff7e6;border-radius:12px;border-left:4px solid #fa8c16;">
+            <h4 style="color:#fa8c16;margin:0 0 10px;">💰 财运</h4>
+            <p><strong>财富级别：</strong>${aspects.wealth.level}</p>
+            <p><strong>主要来源：</strong>${aspects.wealth.source}</p>
+            <p><strong>聚财特征：</strong>${aspects.wealth.trait}</p>
+            <p><strong>建议：</strong>${aspects.wealth.advice}</p>
+            <p style="color:#d48806;font-size:0.8em;margin-top:10px;">${aspects.wealth.warning}</p>
+        </div>
+    `;
+    
+    // 婚恋
+    const marriageHtml = `
+        <div style="margin:15px 0;padding:15px;background:#ffe7f6;border-radius:12px;border-left:4px solid #eb2f96;">
+            <h4 style="color:#eb2f96;margin:0 0 10px;">❤️ 婚恋</h4>
+            <p><strong>适配对象：</strong>${aspects.marriage.spouseTrait}</p>
+            <p><strong>婚龄倾向：</strong>${aspects.marriage.marriageAge}</p>
+            <p><strong>潜在风险：</strong>${aspects.marriage.marriageRisk}</p>
+            <p><strong>建议：</strong>${aspects.marriage.advice}</p>
+            <p style="color:#d48806;font-size:0.8em;margin-top:10px;">${aspects.marriage.warning}</p>
+        </div>
+    `;
+    
+    // 子女
+    const childrenHtml = `
+        <div style="margin:15px 0;padding:15px;background:#f0f5ff;border-radius:12px;border-left:4px solid #2f54eb;">
+            <h4 style="color:#2f54eb;margin:0 0 10px;">👨‍👩‍👧 子女</h4>
+            <p><strong>缘分特征：</strong>${aspects.children.tendency}</p>
+            <p><strong>头胎倾向：</strong>${aspects.children.firstChildGender}</p>
+            <p><strong>育儿建议：</strong>${aspects.children.parentingAdvice}</p>
+            <p style="color:#d48806;font-size:0.8em;margin-top:10px;">${aspects.children.warning}</p>
+        </div>
+    `;
+    
+    // 六亲
+    const familyHtml = `
+        <div style="margin:15px 0;padding:15px;background:#fcffe6;border-radius:12px;border-left:4px solid #a0d911;">
+            <h4 style="color:#a0d911;margin:0 0 10px;">👨‍👩‍👦 六亲</h4>
+            <p><strong>父亲：</strong>${aspects.family.fatherRelation}</p>
+            <p><strong>母亲：</strong>${aspects.family.motherRelation}</p>
+            <p><strong>兄弟姐妹：</strong>${aspects.family.siblingRelation}</p>
+            <p style="color:#d48806;font-size:0.8em;margin-top:10px;">${aspects.family.warning}</p>
+        </div>
+    `;
+    
+    // 健康
+    const healthHtml = `
+        <div style="margin:15px 0;padding:15px;background:#fff1f0;border-radius:12px;border-left:4px solid #ff4d4f;">
+            <h4 style="color:#ff4d4f;margin:0 0 10px;">🏥 健康</h4>
+            <p><strong>需关注脏腑：</strong>${aspects.health.weakOrgans}</p>
+            <p><strong>易患问题：</strong>${aspects.health.potentialDiseases}</p>
+            <p><strong>养生建议：</strong>${aspects.health.advice}</p>
+            <p style="color:#d48806;font-size:0.8em;margin-top:10px;">${aspects.health.warning}</p>
+        </div>
+    `;
+    
+    return careerHtml + wealthHtml + marriageHtml + childrenHtml + familyHtml + healthHtml;
+}
+
+/**
+ * 生成大运流年走势解读
+ */
+function generateDaYunAnalysis(daYun, bazi) {
+    // 当前大运（找到当前年龄所在的大运）
     const currentYear = new Date().getFullYear();
-    const yearStemIdx = (currentYear - 3) % 10;
-    const yearStem = STEMS[yearStemIdx];
-    const yearElement = ELEMENTS[yearStem];
-    const isFavorable = yearElement === career.dominantElement || 
-                        yearElement === dayElement ||
-                        (career.personality.keywords.some(k => k.includes(yearElement)));
+    const birthYear = currentYear - 30; // 假设用户30岁左右
+    const currentAge = currentYear - birthYear;
     
-    const futureTrend = `${currentYear}年（${yearStem}${yearElement}年）${isFavorable ? '运势向好' : '运势平稳'}。${isFavorable ? '五行能量加持，适合把握机会开拓进取。' : '稳中求进，宜巩固基础、积累经验。'}未来三年建议专注${career.dominantElement}行业的发展，${career.template.direction === '主动出击型' ? '可尝试突破性转型或创业尝试' : '宜在现有领域深耕，稳步提升专业能力'}。`;
+    let currentDaYun = daYun.find(d => currentAge >= d.startAge && currentAge <= d.endAge) || daYun[2];
     
-    return {
-        topJobs,
-        developmentAdvice,
-        avoidIndustries,
-        futureTrend
-    };
-}
-/**
- * 生成八字四柱详解
- */
-function generateBaziDetail(bazi) {
-    const pillars = [
-        { label: '年柱', ...bazi.year, meaning: '代表祖上、童年、根基' },
-        { label: '月柱', ...bazi.month, meaning: '代表父母、兄弟姐妹、青年' },
-        { label: '日柱', ...bazi.day, meaning: '代表自己、配偶、中年', isDayMaster: true },
-        { label: '时柱', ...bazi.hour, meaning: '代表子女、晚年、归宿' }
-    ];
-    return pillars.map(p => `<div class="pillar-detail"><h4 style="color:#1890ff;">${p.label} ${p.stem}${p.branch}${p.isDayMaster ? '（日主）' : ''}</h4><p style="color:#666;font-size:0.9em;">${p.meaning}</p><p style="color:#888;font-size:0.85em;">天干${p.stem}属${ELEMENTS[p.stem]}，地支${p.branch}属${BRANCH_ELEMENTS[p.branch]}</p></div>`).join('<hr style="border:none;border-top:1px dashed #eee;margin:10px 0;">');
-}
-
-/**
- * 生成五行能量分析
- */
-function generateElementAnalysis(elements, strength) {
-    const total = Object.values(elements).reduce((a, b) => a + b, 0);
-    const sorted = Object.entries(elements).sort((a, b) => b[1] - a[1]);
-    return `<div class="element-grid" style="display:flex;gap:20px;justify-content:space-around;">${sorted.map(([name, count]) => {const percent = Math.round(count / total * 100);const status = count >= 3 ? '旺' : count >= 2 ? '中' : '弱';const color = count >= 3 ? '#52c41a' : count >= 2 ? '#1890ff' : '#ff4d4f';return `<div style="text-align:center;"><strong style="font-size:1.5em;color:${color};">${name}</strong><p style="margin:5px 0;">${count}个 (${percent}%)</p><span style="color:${color};font-weight:bold;">${status}</span></div>`}).join('')}</div><div style="margin-top:15px;padding:10px;background:#f6f8fa;border-radius:8px;"><p><strong>身强弱判断：</strong>${strength.strength}</p><p style="font-size:0.85em;color:#888;">${strength.getsSeason ? '✓ 得月令' : '○ 不得月令'} · ${strength.hasRoot ? '✓ 地支有根' : '○ 地支无根'} · 天干帮扶${strength.supportCount}个</p></div>`;
-}
-
-/**
- * 生成十神分析
- */
-function generateShishenAnalysis(bazi) {
-    const dayElement = ELEMENTS[bazi.dayMaster];
-    const shishenMap = {
-        '木': {'木':'比肩','火':'食神','土':'偏财','金':'七杀','水':'印星'},
-        '火': {'火':'比肩','土':'食神','金':'偏财','水':'七杀','木':'印星'},
-        '土': {'土':'比肩','金':'食神','水':'偏财','木':'七杀','火':'印星'},
-        '金': {'金':'比肩','水':'食神','木':'偏财','火':'七杀','土':'印星'},
-        '水': {'水':'比肩','木':'食神','火':'偏财','土':'七杀','金':'印星'}
-    };
-    const yearSS = shishenMap[dayElement][ELEMENTS[bazi.year.stem]];
-    const monthSS = shishenMap[dayElement][ELEMENTS[bazi.month.stem]];
-    const hourSS = shishenMap[dayElement][ELEMENTS[bazi.hour.stem]];
-    return `<div style="display:flex;gap:15px;justify-content:space-around;"><div style="text-align:center;"><strong>年干${bazi.year.stem}</strong><p style="color:#1890ff;">${yearSS}</p></div><div style="text-align:center;"><strong>月干${bazi.month.stem}</strong><p style="color:#1890ff;">${monthSS}</p></div><div style="text-align:center;"><strong>时干${bazi.hour.stem}</strong><p style="color:#1890ff;">${hourSS}</p></div></div><p style="margin-top:15px;color:#888;font-size:0.85em;text-align:center;">十神代表您与外界能量的关系模式，影响性格和人际关系</p>`;
+    // 大运列表HTML
+    const daYunListHtml = daYun.map((d, idx) => {
+        const isCurrent = d === currentDaYun;
+        const bgColor = d.isUseful ? '#f6ffed' : (d.isAvoid ? '#fff2f0' : '#f6f8fa');
+        const borderColor = isCurrent ? '#1890ff' : (d.isUseful ? '#52c41a' : (d.isAvoid ? '#ff4d4f' : '#e8e8e8'));
+        
+        return `
+            <div style="margin:10px 0;padding:12px;background:${bgColor};border-radius:8px;border-left:4px solid ${borderColor};${isCurrent ? 'box-shadow:0 2px 8px rgba(24,144,255,0.2);' : ''}">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <strong>${d.ganZhi}大运 (${d.startAge}-${d.endAge}岁)</strong>
+                    ${isCurrent ? '<span style="background:#1890ff;color:#fff;padding:2px 8px;border-radius:12px;font-size:12px;">当前</span>' : ''}
+                    <span style="color:${d.isUseful ? '#52c41a' : (d.isAvoid ? '#ff4d4f' : '#888')};font-weight:bold;">${d.rating}</span>
+                </div>
+                <p style="color:#888;font-size:0.85em;margin:5px 0;">天干${d.stem}属${d.stemElement}（${d.tenGod}），地支${d.branch}属${d.branchElement}</p>
+                <p style="color:#666;font-size:0.9em;">${d.desc}</p>
+            </div>
+        `;
+    }).join('');
+    
+    // 未来5年流年分析
+    const future5YearsHtml = generateFuture5Years(bazi);
+    
+    return `
+        <div style="margin:10px 0;padding:15px;background:#f6f8fa;border-radius:12px;">
+            <strong>大运周期（每运10年）：</strong>
+            <p style="color:#888;font-size:0.85em;margin:10px 0;">大运是命理学中的十年运势周期，反映人生不同阶段的运势起伏。当前运势受大运与流年共同影响。</p>
+            <p style="color:#d48806;font-size:0.8em;margin-top:10px;">📌 <strong>术语解释：</strong><strong>大运</strong>是以10年为周期的运势阶段，由出生月柱顺推或逆推得出。<strong>流年</strong>是每年的运势，由当年干支决定。</p>
+        </div>
+        ${daYunListHtml}
+        <div style="margin:20px 0;">
+            <h4 style="color:#1890ff;">📅 未来5年流年走势</h4>
+            ${future5YearsHtml}
+        </div>
+    `;
 }
 
 /**
- * 生成职业详情
+ * 生成未来5年流年分析
  */
-function generateCareerDetail(report) {
-    return `<h4>最佳职业匹配 TOP 5</h4><ul style="list-style:none;padding:0;">${report.topJobs.map((job, i) => `<li style="margin:10px 0;padding:15px;background:linear-gradient(135deg,#f6f8fa,#fff);border-radius:12px;border:1px solid #e8e8e8;"><div style="display:flex;align-items:center;justify-content:space-between;"><strong style="color:#1890ff;font-size:1.1em;">${i+1}. ${job.name}</strong><span style="background:#52c41a;color:#fff;padding:4px 12px;border-radius:20px;font-size:0.85em;">匹配 ${job.score}%</span></div><p style="margin:8px 0 0;color:#888;font-size:0.9em;">${job.reason}</p></li>`).join('')}</ul><div style="margin-top:20px;padding:15px;background:#e6f7ff;border-radius:12px;border:1px solid #91d5ff;"><h4 style="color:#1890ff;margin:0 0 10px;">💡 职业发展建议</h4><p style="color:#666;line-height:1.8;">${report.developmentAdvice}</p></div><div style="margin-top:15px;padding:15px;background:#fff2f0;border-radius:12px;border:1px solid #ffccc7;"><h4 style="color:#e74c3c;margin:0 0 10px;">⚠️ 需谨慎的行业</h4><p style="color:#666;line-height:1.8;">${report.avoidIndustries}</p></div>`;
-}
-
-/**
- * 生成开运指南
- */
-function generateFortuneGuide(career, bazi) {
-    const elem = career.dominantElement;
-    const guide = {
-        '金': {dir:'西方、西北方',color:'白色、金色',num:'4、9',item:'金银首饰'},
-        '水': {dir:'北方',color:'黑色、蓝色',num:'1、6',item:'水晶、珍珠'},
-        '木': {dir:'东方、东南方',color:'绿色、青色',num:'3、8',item:'木质手串'},
-        '火': {dir:'南方',color:'红色、紫色',num:'2、7',item:'红宝石'},
-        '土': {dir:'中央、西南',color:'黄色、棕色',num:'5、10',item:'玉石'}
-    };
-    const g = guide[elem];
-    return `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:15px;"><div style="padding:12px;background:#f6f8fa;border-radius:8px;text-align:center;"><strong>🧭 有利方位</strong><p style="color:#666;margin:5px 0;">${g.dir}</p></div><div style="padding:12px;background:#f6f8fa;border-radius:8px;text-align:center;"><strong>🎨 助力颜色</strong><p style="color:#666;margin:5px 0;">${g.color}</p></div><div style="padding:12px;background:#f6f8fa;border-radius:8px;text-align:center;"><strong>🔢 幸运数字</strong><p style="color:#666;margin:5px 0;">${g.num}</p></div><div style="padding:12px;background:#f6f8fa;border-radius:8px;text-align:center;"><strong>💎 开运饰品</strong><p style="color:#666;margin:5px 0;">${g.item}</p></div></div>`;
-}
-
-/**
- * 生成未来运势
- */
-function generateFutureTrend(bazi, career) {
+function generateFuture5Years(bazi) {
     const currentYear = new Date().getFullYear();
+    const usefulGod = bazi.usefulGod;
+    
     let html = '';
-    for(let i=0;i<3;i++){
-        const y = currentYear + i;
-        const stemIdx = (y - 4) % 10;
-        const branchIdx = (y - 4) % 12;
+    for (let i = 0; i < 5; i++) {
+        const year = currentYear + i;
+        const stemIdx = (year - 4) % 10;
+        const branchIdx = (year - 4) % 12;
         const stem = STEMS[stemIdx];
         const branch = BRANCHES[branchIdx];
-        const elem = ELEMENTS[stem];
-        const isFav = elem === career.dominantElement || elem === ELEMENTS[bazi.dayMaster];
-        const score = isFav ? '⭐⭐⭐⭐' : '⭐⭐⭐';
-        html += `<div style="margin:10px 0;padding:12px;background:${isFav ? '#f6ffed' : '#f6f8fa'};border-radius:8px;border-left:3px solid ${isFav ? '#52c41a' : '#1890ff'};"><strong>${y}年 ${stem}${branch}年</strong><span style="float:right;">${score}</span><p style="color:#888;font-size:0.85em;margin:5px 0;">天干${stem}属${elem}，${isFav ? '与您五行相合，运势向好' : '运势平稳，稳中求进'}</p></div>`;
+        const stemElement = ELEMENTS[stem];
+        const branchElement = BRANCH_ELEMENTS[branch];
+        
+        const isUseful = usefulGod.useful.includes(stemElement) || usefulGod.useful.includes(branchElement);
+        const isAvoid = usefulGod.avoid.includes(stemElement) || usefulGod.avoid.includes(branchElement);
+        
+        const bg = isUseful ? '#f6ffed' : (isAvoid ? '#fff2f0' : '#f6f8fa');
+        const border = isUseful ? '#52c41a' : (isAvoid ? '#ff4d4f' : '#e8e8e8');
+        const rating = isUseful ? '⭐⭐⭐⭐' : (isAvoid ? '⭐⭐' : '⭐⭐⭐');
+        
+        html += `
+            <div style="margin:8px 0;padding:10px;background:${bg};border-radius:8px;border-left:3px solid ${border};">
+                <strong>${year}年 ${stem}${branch}年</strong>
+                <span style="float:right;">${rating}</span>
+                <p style="color:#888;font-size:0.85em;margin:5px 0;">天干${stem}属${stemElement}，地支${branch}属${branchElement}
+                ${isUseful ? '为喜用，运势向好' : (isAvoid ? '为忌神，需谨慎' : '运势平稳')}</p>
+            </div>
+        `;
     }
-    return html + '<p style="margin-top:15px;color:#888;font-size:0.85em;text-align:center;">运势仅供参考，个人努力和机遇同样重要</p>';
+    return html;
+}
+
+/**
+ * 生成核心建议与风险规避
+ */
+function generateCoreAdvice(destiny, bazi) {
+    const fortuneGuide = destiny.fortuneGuide;
+    const usefulGod = bazi.usefulGod;
+    const aspects = destiny.aspects;
+    
+    // 发展方向
+    const directionHtml = `
+        <div style="margin:15px 0;padding:15px;background:#e6f7ff;border-radius:12px;">
+            <h4 style="color:#1890ff;margin:0 0 10px;">🧭 发展方向</h4>
+            <p><strong>有利行业：</strong>五行属${fortuneGuide.element}的行业，如${CareerEngine.ELEMENT_CAREERS[fortuneGuide.element]?.industries.slice(0, 5).join('、') || '相关行业'}</p>
+            <p><strong>有利方位：</strong>${fortuneGuide.direction}</p>
+            <p><strong>有利季节：</strong>${fortuneGuide.season}</p>
+            <p style="color:#d48806;font-size:0.8em;margin-top:10px;">${fortuneGuide.explanation}</p>
+        </div>
+    `;
+    
+    // 开运物品
+    const itemsHtml = `
+        <div style="margin:15px 0;padding:15px;background:#fff7e6;border-radius:12px;">
+            <h4 style="color:#fa8c16;margin:0 0 10px;">🌈 开运指南</h4>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+                <div style="padding:10px;background:#fff;border-radius:8px;text-align:center;">
+                    <strong>🎨 助力颜色</strong>
+                    <p style="color:#666;margin:5px 0;">${fortuneGuide.color}</p>
+                </div>
+                <div style="padding:10px;background:#fff;border-radius:8px;text-align:center;">
+                    <strong>🔢 幸运数字</strong>
+                    <p style="color:#666;margin:5px 0;">${fortuneGuide.number}</p>
+                </div>
+                <div style="padding:10px;background:#fff;border-radius:8px;text-align:center;">
+                    <strong>💎 开运饰品</strong>
+                    <p style="color:#666;margin:5px 0;">${fortuneGuide.item}</p>
+                </div>
+                <div style="padding:10px;background:#fff;border-radius:8px;text-align:center;">
+                    <strong>🧭 有利方位</strong>
+                    <p style="color:#666;margin:5px 0;">${fortuneGuide.direction}</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // 人际建议
+    const relationHtml = `
+        <div style="margin:15px 0;padding:15px;background:#fcffe6;border-radius:12px;">
+            <h4 style="color:#52c41a;margin:0 0 10px;">👥 人际建议</h4>
+            <p><strong>适配类型：</strong>五行${usefulGod.useful.join('、')}旺的人，性格沉稳务实，能提供支持</p>
+            <p><strong>需规避：</strong>五行${usefulGod.avoid.join('、') || '无明显忌神'}过旺的人，性格急躁或过于理想化，合作需谨慎</p>
+        </div>
+    `;
+    
+    // 风险提示
+    const riskHtml = `
+        <div style="margin:15px 0;padding:15px;background:#fff2f0;border-radius:12px;border-left:4px solid #ff4d4f;">
+            <h4 style="color:#ff4d4f;margin:0 0 10px;">⚠️ 风险提示</h4>
+            <p><strong>关键年份：</strong>未来5年中，${usefulGod.avoid.length > 0 ? '逢' + usefulGod.avoid.join('、') + '旺的流年需特别注意' : '无明显高风险年份'}</p>
+            <p><strong>风险类型：</strong>投资破财、事业挫败、健康下滑、感情纠纷（需结合具体流年判断）</p>
+            <p><strong>化解思路：</strong>宜静不宜动，深耕专业，强身健体，多学习（补印），减少不必要的社交与开销</p>
+        </div>
+    `;
+    
+    return directionHtml + itemsHtml + relationHtml + riskHtml;
 }
