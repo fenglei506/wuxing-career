@@ -505,92 +505,119 @@ function showFullReport() {
     // 隐藏支付按钮
     document.getElementById('paymentSection').style.display = 'none';
     
-    // 获取当前分析数据
-    const dateType = document.getElementById('dateType').value;
-    const year = parseInt(document.getElementById('birthYear').value);
-    const month = parseInt(document.getElementById('birthMonth').value);
-    const day = parseInt(document.getElementById('birthDay').value);
-    const hour = parseInt(document.getElementById('birthHour').value);
-    const gender = document.getElementById('gender').value;
+    // 获取结果区域
+    const resultSection = document.getElementById('resultSection');
     
-    // 转换为阳历（用于八字计算）
-    let solarYear, solarMonth, solarDay;
-    if (dateType === 'lunar') {
-        const solar = LunarConverter.lunarToSolar(year, month, day);
-        solarYear = solar.year;
-        solarMonth = solar.month;
-        solarDay = solar.day;
-    } else {
-        solarYear = year;
-        solarMonth = month;
-        solarDay = day;
-    }
-    
-    // 计算完整分析
-    const bazi = BaziEngine.getFullBazi(solarYear, solarMonth, solarDay, hour);
-    const elements = BaziEngine.countElements(bazi);
-    const strength = BaziEngine.analyzeStrength(bazi, elements);
-    
-    // 计算大运
-    const daYun = BaziEngine.calculateDaYun(bazi, solarYear, solarMonth, solarDay, hour, gender === '男' ? 'male' : 'female');
-    
-    // 六维度分析
-    const destiny = CareerEngine.analyzeDestiny(bazi, strength.detail, elements, gender === '男' ? 'male' : 'female');
-    
-    // 清空原有内容，重新渲染完整报告
-    resultSection.innerHTML = `
-        <h2>🏆 完整命理分析报告</h2>
+    try {
+        // 获取当前分析数据
+        const dateType = document.getElementById('dateType').value;
+        const year = parseInt(document.getElementById('birthYear').value);
+        const month = parseInt(document.getElementById('birthMonth').value);
+        const day = parseInt(document.getElementById('birthDay').value);
+        const hour = parseInt(document.getElementById('birthHour').value);
+        const gender = document.getElementById('gender').value;
         
-        <!-- 成功提示 -->
-        <div class="result-card" style="background:#f6ffed;border:1px solid #b7eb8f;">
-            <p style="color:#52c41a;text-align:center;font-size:18px;margin:0;">✅ 报告已解锁！以下是详细分析内容</p>
-        </div>
+        // 转换为阳历（用于八字计算）
+        let solarYear, solarMonth, solarDay;
+        if (dateType === 'lunar') {
+            const solar = LunarConverter.lunarToSolar(year, month, day);
+            solarYear = solar.year;
+            solarMonth = solar.month;
+            solarDay = solar.day;
+        } else {
+            solarYear = year;
+            solarMonth = month;
+            solarDay = day;
+        }
         
-        <!-- 前置声明 -->
-        <div class="result-card" style="background:#fffbe6;border:1px solid #ffe58f;">
-            <p style="color:#d48806;text-align:center;margin:0;font-size:14px;">本分析为文化娱乐参考，非专业决策依据，具体发展需结合个人努力与客观环境。</p>
-        </div>
+        console.log('开始生成完整报告:', { solarYear, solarMonth, solarDay, hour, gender });
         
-        <!-- 基础信息 -->
-        <div class="result-card">
-            <h3>📋 基础信息</h3>
-            <div class="info-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
-                <p><strong>阳历：</strong>${solarYear}年${solarMonth}月${solarDay}日 ${['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][hour]}时</p>
-                <p><strong>农历：</strong>${dateType === 'lunar' ? LunarConverter.getLunarYearPillar(year).name + ' ' + month + '月' + day + '日' : LunarConverter.solarToLunar(solarYear, solarMonth, solarDay).fullName}</p>
-                <p><strong>性别：</strong>${gender === '男' || gender === 'male' ? '男命' : '女命'}</p>
-                <p><strong>年龄：</strong>${new Date().getFullYear() - solarYear}岁（虚岁）</p>
+        // 计算完整分析
+        const bazi = BaziEngine.getFullBazi(solarYear, solarMonth, solarDay, hour);
+        const elements = BaziEngine.countElements(bazi);
+        const strength = BaziEngine.analyzeStrength(bazi, elements);
+        
+        console.log('八字计算完成:', bazi);
+        
+        // 计算大运
+        const daYun = BaziEngine.calculateDaYun(bazi, solarYear, solarMonth, solarDay, hour, gender === '男' ? 'male' : 'female');
+        
+        console.log('大运计算完成:', daYun);
+        
+        // 六维度分析
+        const destiny = CareerEngine.analyzeDestiny(bazi, strength.detail, elements, gender === '男' ? 'male' : 'female');
+        
+        console.log('六维度分析完成:', destiny);
+        
+        // 生成各个部分
+        const baziTechnique = generateBaziTechnique(bazi, strength, elements);
+        const aspectsDetail = generateAspectsDetail(destiny);
+        const daYunAnalysis = generateDaYunAnalysis(daYun, bazi);
+        const coreAdvice = generateCoreAdvice(destiny, bazi);
+        
+        console.log('报告内容生成完成');
+        
+        // 清空原有内容，重新渲染完整报告
+        resultSection.innerHTML = `
+            <h2>🏆 完整命理分析报告</h2>
+            
+            <!-- 成功提示 -->
+            <div class="result-card" style="background:#f6ffed;border:1px solid #b7eb8f;">
+                <p style="color:#52c41a;text-align:center;font-size:18px;margin:0;">✅ 报告已解锁！以下是详细分析内容</p>
             </div>
-        </div>
+            
+            <!-- 前置声明 -->
+            <div class="result-card" style="background:#fffbe6;border:1px solid #ffe58f;">
+                <p style="color:#d48806;text-align:center;margin:0;font-size:14px;">本分析为文化娱乐参考，非专业决策依据，具体发展需结合个人努力与客观环境。</p>
+            </div>
+            
+            <!-- 基础信息 -->
+            <div class="result-card">
+                <h3>📋 基础信息</h3>
+                <div class="info-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+                    <p><strong>阳历：</strong>${solarYear}年${solarMonth}月${solarDay}日 ${['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][hour]}时</p>
+                    <p><strong>农历：</strong>${dateType === 'lunar' ? LunarConverter.getLunarYearPillar(year).name + ' ' + month + '月' + day + '日' : LunarConverter.solarToLunar(solarYear, solarMonth, solarDay).fullName}</p>
+                    <p><strong>性别：</strong>${gender === '男' || gender === 'male' ? '男命' : '女命'}</p>
+                    <p><strong>年龄：</strong>${new Date().getFullYear() - solarYear}岁（虚岁）</p>
+                </div>
+            </div>
+            
+            <!-- 命盘技法解读 -->
+            <div class="result-card">
+                <h3>1. 命盘技法解读</h3>
+                ${baziTechnique}
+            </div>
+            
+            <!-- 命盘事项解读 -->
+            <div class="result-card">
+                <h3>2. 命盘事项解读</h3>
+                ${aspectsDetail}
+            </div>
+            
+            <!-- 大运流年走势 -->
+            <div class="result-card">
+                <h3>3. 大运流年走势解读</h3>
+                ${daYunAnalysis}
+            </div>
+            
+            <!-- 核心建议与风险规避 -->
+            <div class="result-card">
+                <h3>4. 核心建议与风险规避</h3>
+                ${coreAdvice}
+            </div>
+            
+            <!-- 免责声明 -->
+            <div class="result-card" style="background:#fffbe6;border:1px solid #ffe58f;">
+                <p style="color:#d48806;font-size:0.85em;text-align:center;margin:0;">⚠️ 本分析完全基于您提供的命盘信息，命理是趋势的推演，人生的画卷最终由您的每一个选择与行动绘就。若有其他具体疑问，可随时提出。</p>
+            </div>
+        `;
         
-        <!-- 命盘技法解读 -->
-        <div class="result-card">
-            <h3>1. 命盘技法解读</h3>
-            ${generateBaziTechnique(bazi, strength, elements)}
-        </div>
+        console.log('完整报告渲染完成');
         
-        <!-- 命盘事项解读 -->
-        <div class="result-card">
-            <h3>2. 命盘事项解读</h3>
-            ${generateAspectsDetail(destiny)}
-        </div>
-        
-        <!-- 大运流年走势 -->
-        <div class="result-card">
-            <h3>3. 大运流年走势解读</h3>
-            ${generateDaYunAnalysis(daYun, bazi)}
-        </div>
-        
-        <!-- 核心建议与风险规避 -->
-        <div class="result-card">
-            <h3>4. 核心建议与风险规避</h3>
-            ${generateCoreAdvice(destiny, bazi)}
-        </div>
-        
-        <!-- 免责声明 -->
-        <div class="result-card" style="background:#fffbe6;border:1px solid #ffe58f;">
-            <p style="color:#d48806;font-size:0.85em;text-align:center;margin:0;">⚠️ 本分析完全基于您提供的命盘信息，命理是趋势的推演，人生的画卷最终由您的每一个选择与行动绘就。若有其他具体疑问，可随时提出。</p>
-        </div>
-    `;
+    } catch (error) {
+        console.error('生成完整报告时出错:', error);
+        alert('生成报告失败: ' + error.message);
+    }
 }
 
 /**
