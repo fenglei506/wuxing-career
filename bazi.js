@@ -525,7 +525,7 @@ function calculateDaYun(bazi, year, month, day, hour, gender) {
         const baziObj = lunarDate.getBazi();
         
         // 获取大运（男命顺行，女命逆行）
-        const yun = baziObj.getYun(gender === 'male' ? 1 : 0);
+        const yun = baziObj.getYun(gender === 'male' || gender === '男' ? 1 : 0);
         const daYunList = yun.getDaYun();
         
         // 格式化大运数据

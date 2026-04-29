@@ -463,8 +463,8 @@ function renderCareer(career) {
         <div class="career-list">
             <h4>发展方向</h4>
             <ul>
-                <li>${career.template.direction}</li>
-                <li>${career.template.advice}</li>
+                <li>宜前往${career.careerInfo.direction}发展</li>
+                <li>发挥${career.careerInfo.traits.join('、')}特质，在${career.dominantElement}行业深耕</li>
             </ul>
         </div>
     `;
@@ -532,10 +532,10 @@ function showFullReport() {
     const strength = BaziEngine.analyzeStrength(bazi, elements);
     
     // 计算大运
-    const daYun = BaziEngine.calculateDaYun(bazi, solarYear, solarMonth, solarDay, hour, gender);
+    const daYun = BaziEngine.calculateDaYun(bazi, solarYear, solarMonth, solarDay, hour, gender === '男' ? 'male' : 'female');
     
     // 六维度分析
-    const destiny = CareerEngine.analyzeDestiny(bazi, strength.detail, elements, gender);
+    const destiny = CareerEngine.analyzeDestiny(bazi, strength.detail, elements, gender === '男' ? 'male' : 'female');
     
     // 清空原有内容，重新渲染完整报告
     resultSection.innerHTML = `
@@ -557,7 +557,7 @@ function showFullReport() {
             <div class="info-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
                 <p><strong>阳历：</strong>${solarYear}年${solarMonth}月${solarDay}日 ${['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][hour]}时</p>
                 <p><strong>农历：</strong>${dateType === 'lunar' ? LunarConverter.getLunarYearPillar(year).name + ' ' + month + '月' + day + '日' : LunarConverter.solarToLunar(solarYear, solarMonth, solarDay).fullName}</p>
-                <p><strong>性别：</strong>${gender === 'male' ? '男命' : '女命'}</p>
+                <p><strong>性别：</strong>${gender === '男' || gender === 'male' ? '男命' : '女命'}</p>
                 <p><strong>年龄：</strong>${new Date().getFullYear() - solarYear}岁（虚岁）</p>
             </div>
         </div>
