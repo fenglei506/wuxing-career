@@ -334,7 +334,7 @@ function renderResults(bazi, elements, strength, career, solarInfo, lunarInfo) {
         </div>
     `;
     
-    // 重新绑定支付按钮事件
+    // renderResults 重写了 innerHTML， 元素被重新创建，必须重新绑定事件
     document.getElementById('paymentBtn').addEventListener('click', showPaymentModal);
     
     // 渲染八字
