@@ -867,14 +867,21 @@ function generateCoreAdvice(destiny, bazi) {
     const usefulGod = bazi.usefulGod;
     const aspects = destiny.aspects;
     
+    // 安全获取数据
+    const element = fortuneGuide?.element || '木';
+    const elementCareers = CareerEngine.ELEMENT_CAREERS[element] || CareerEngine.ELEMENT_CAREERS['木'];
+    const industries = elementCareers?.industries || ['教育培训', '文化出版', '农林园艺'];
+    const useful = usefulGod?.useful || ['木', '水'];
+    const avoid = usefulGod?.avoid || ['火', '土'];
+    
     // 发展方向
     const directionHtml = `
         <div style="margin:15px 0;padding:15px;background:#e6f7ff;border-radius:12px;">
             <h4 style="color:#1890ff;margin:0 0 10px;">🧭 发展方向</h4>
-            <p><strong>有利行业：</strong>五行属${fortuneGuide.element}的行业，如${CareerEngine.ELEMENT_CAREERS[fortuneGuide.element]?.industries.slice(0, 5).join('、') || '相关行业'}</p>
-            <p><strong>有利方位：</strong>${fortuneGuide.direction}</p>
-            <p><strong>有利季节：</strong>${fortuneGuide.season}</p>
-            <p style="color:#d48806;font-size:0.8em;margin-top:10px;">${fortuneGuide.explanation}</p>
+            <p><strong>有利行业：</strong>五行属${element}的行业，如${industries.slice(0, 5).join('、')}</p>
+            <p><strong>有利方位：</strong>${fortuneGuide?.direction || '东方、东南方'}</p>
+            <p><strong>有利季节：</strong>${fortuneGuide?.season || '春季'}</p>
+            <p style="color:#d48806;font-size:0.8em;margin-top:10px;">${fortuneGuide?.explanation || '【开运原理】通过方位、颜色等五行属性增强运势。'}</p>
         </div>
     `;
     
@@ -885,19 +892,19 @@ function generateCoreAdvice(destiny, bazi) {
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
                 <div style="padding:10px;background:#fff;border-radius:8px;text-align:center;">
                     <strong>🎨 助力颜色</strong>
-                    <p style="color:#666;margin:5px 0;">${fortuneGuide.color}</p>
+                    <p style="color:#666;margin:5px 0;">${fortuneGuide?.color || '绿色、青色'}</p>
                 </div>
                 <div style="padding:10px;background:#fff;border-radius:8px;text-align:center;">
                     <strong>🔢 幸运数字</strong>
-                    <p style="color:#666;margin:5px 0;">${fortuneGuide.number}</p>
+                    <p style="color:#666;margin:5px 0;">${fortuneGuide?.number || '3、8'}</p>
                 </div>
                 <div style="padding:10px;background:#fff;border-radius:8px;text-align:center;">
                     <strong>💎 开运饰品</strong>
-                    <p style="color:#666;margin:5px 0;">${fortuneGuide.item}</p>
+                    <p style="color:#666;margin:5px 0;">${fortuneGuide?.item || '木质手串'}</p>
                 </div>
                 <div style="padding:10px;background:#fff;border-radius:8px;text-align:center;">
                     <strong>🧭 有利方位</strong>
-                    <p style="color:#666;margin:5px 0;">${fortuneGuide.direction}</p>
+                    <p style="color:#666;margin:5px 0;">${fortuneGuide?.direction || '东方、东南方'}</p>
                 </div>
             </div>
         </div>
@@ -907,8 +914,8 @@ function generateCoreAdvice(destiny, bazi) {
     const relationHtml = `
         <div style="margin:15px 0;padding:15px;background:#fcffe6;border-radius:12px;">
             <h4 style="color:#52c41a;margin:0 0 10px;">👥 人际建议</h4>
-            <p><strong>适配类型：</strong>五行${usefulGod.useful.join('、')}旺的人，性格沉稳务实，能提供支持</p>
-            <p><strong>需规避：</strong>五行${usefulGod.avoid.join('、') || '无明显忌神'}过旺的人，性格急躁或过于理想化，合作需谨慎</p>
+            <p><strong>适配类型：</strong>五行${useful.join('、')}旺的人，性格沉稳务实，能提供支持</p>
+            <p><strong>需规避：</strong>五行${avoid.join('、') || '无明显忌神'}过旺的人，性格急躁或过于理想化，合作需谨慎</p>
         </div>
     `;
     
@@ -916,7 +923,7 @@ function generateCoreAdvice(destiny, bazi) {
     const riskHtml = `
         <div style="margin:15px 0;padding:15px;background:#fff2f0;border-radius:12px;border-left:4px solid #ff4d4f;">
             <h4 style="color:#ff4d4f;margin:0 0 10px;">⚠️ 风险提示</h4>
-            <p><strong>关键年份：</strong>未来5年中，${usefulGod.avoid.length > 0 ? '逢' + usefulGod.avoid.join('、') + '旺的流年需特别注意' : '无明显高风险年份'}</p>
+            <p><strong>关键年份：</strong>未来5年中，${avoid.length > 0 ? '逢' + avoid.join('、') + '旺的流年需特别注意' : '无明显高风险年份'}</p>
             <p><strong>风险类型：</strong>投资破财、事业挫败、健康下滑、感情纠纷（需结合具体流年判断）</p>
             <p><strong>化解思路：</strong>宜静不宜动，深耕专业，强身健体，多学习（补印），减少不必要的社交与开销</p>
         </div>
