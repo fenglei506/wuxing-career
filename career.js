@@ -312,7 +312,8 @@ function analyzeMarriage(bazi, strengthDetail, tenGods, gender) {
         spouseTrait,
         marriageAge,
         marriageRisk,
-        advice
+        advice,
+        warning: '【术语解释】日支：婚姻宫；财星（男命）：妻星；官星（女命）：夫星。'
     };
 }
 
@@ -346,7 +347,9 @@ function analyzeChildren(bazi, tenGods) {
     }
     
     return {
-        info: childrenInfo,
+        tendency: childrenInfo,
+        firstChildGender: '需结合配偶命盘推算',
+        parentingAdvice: advice,
         relation: childrenRelation,
         advice,
         warning: '【术语解释】食神、伤官：代表子女星，食神温和，伤官叛逆。'
@@ -387,6 +390,9 @@ function analyzeFamily(bazi, tenGods) {
     advice = '六亲缘分各有不同，宜珍惜亲情，和睦相处。';
     
     return {
+        fatherRelation: '父亲缘分需结合偏财星分析',
+        motherRelation: motherInfo,
+        siblingRelation: siblingInfo,
         mother: motherInfo,
         siblings: siblingInfo,
         advice,
@@ -421,6 +427,8 @@ function analyzeHealth(bazi, elements) {
     healthAdvice = '注意作息规律，适度运动，保持心情舒畅。';
     
     return {
+        weakOrgans: healthRisk,
+        potentialDiseases: '需结合具体五行旺衰分析',
         risk: healthRisk,
         advice: healthAdvice,
         warning: '【术语解释】五行对应脏腑：木-肝、火-心、土-脾、金-肺、水-肾。'
