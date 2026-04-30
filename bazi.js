@@ -16,18 +16,18 @@ const BRANCH_ELEMENTS = { '子': '水', '丑': '土', '寅': '木', '卯': '木'
 
 // 地支藏干（主气、中气、余气）
 const BRANCH_HIDDEN_STEMS = {
-    '子': [{stem:'癸', ratio:1}],  // 全水
-    '丑': [{stem:'己', ratio:0.6}, {stem:'癸', ratio:0.25}, {stem:'辛', ratio:0.15}],  // 土癸水辛金
-    '寅': [{stem:'甲', ratio:0.6}, {stem:'丙', ratio:0.25}, {stem:'戊', ratio:0.15}],  // 甲木丙火戊土
-    '卯': [{stem:'乙', ratio:1}],  // 全木
-    '辰': [{stem:'戊', ratio:0.6}, {stem:'乙', ratio:0.25}, {stem:'癸', ratio:0.15}],  // 戊土乙木癸水
-    '巳': [{stem:'丙', ratio:0.6}, {stem:'庚', ratio:0.25}, {stem:'戊', ratio:0.15}],  // 丙火庚金戊土
-    '午': [{stem:'丁', ratio:0.7}, {stem:'己', ratio:0.3}],  // 丁火己土
-    '未': [{stem:'己', ratio:0.6}, {stem:'丁', ratio:0.25}, {stem:'乙', ratio:0.15}],  // 己土丁火乙木
-    '申': [{stem:'庚', ratio:0.6}, {stem:'壬', ratio:0.25}, {stem:'戊', ratio:0.15}],  // 庚金壬水戊土
-    '酉': [{stem:'辛', ratio:1}],  // 全金
-    '戌': [{stem:'戊', ratio:0.6}, {stem:'辛', ratio:0.25}, {stem:'丁', ratio:0.15}],  // 戊土辛金丁火
-    '亥': [{stem:'壬', ratio:0.7}, {stem:'甲', ratio:0.3}]   // 壬水甲木
+    '子': [{stem:'癸', ratio:1}],
+    '丑': [{stem:'己', ratio:0.6}, {stem:'癸', ratio:0.25}, {stem:'辛', ratio:0.15}],
+    '寅': [{stem:'甲', ratio:0.6}, {stem:'丙', ratio:0.25}, {stem:'戊', ratio:0.15}],
+    '卯': [{stem:'乙', ratio:1}],
+    '辰': [{stem:'戊', ratio:0.6}, {stem:'乙', ratio:0.25}, {stem:'癸', ratio:0.15}],
+    '巳': [{stem:'丙', ratio:0.6}, {stem:'庚', ratio:0.25}, {stem:'戊', ratio:0.15}],
+    '午': [{stem:'丁', ratio:0.7}, {stem:'己', ratio:0.3}],
+    '未': [{stem:'己', ratio:0.6}, {stem:'丁', ratio:0.25}, {stem:'乙', ratio:0.15}],
+    '申': [{stem:'庚', ratio:0.6}, {stem:'壬', ratio:0.25}, {stem:'戊', ratio:0.15}],
+    '酉': [{stem:'辛', ratio:1}],
+    '戌': [{stem:'戊', ratio:0.6}, {stem:'辛', ratio:0.25}, {stem:'丁', ratio:0.15}],
+    '亥': [{stem:'壬', ratio:0.7}, {stem:'甲', ratio:0.3}]
 };
 
 // 十神定义与解释
@@ -76,13 +76,9 @@ const SOLAR_TERM_DAYS = {
 
 // 五行生克关系
 const FIVE_ELEMENT_RELATIONS = {
-    // 我生（泄耗）
     generate: { '木': '火', '火': '土', '土': '金', '金': '水', '水': '木' },
-    // 生我（印星）
     generatedBy: { '木': '水', '火': '木', '土': '火', '金': '土', '水': '金' },
-    // 我克（财星）
     conquer: { '木': '土', '火': '金', '土': '水', '金': '木', '水': '火' },
-    // 克我（官杀）
     conqueredBy: { '木': '金', '火': '水', '土': '木', '金': '火', '水': '土' }
 };
 
@@ -143,9 +139,6 @@ function getHourPillar(dayStem, hour) {
 
 /**
  * 计算十神（某天干相对于日主的十神）
- * @param dayMaster 日主天干
- * @param targetStem 要计算的天干
- * @returns 十神名称
  */
 function getTenGod(dayMaster, targetStem) {
     const dayElement = ELEMENTS[dayMaster];
@@ -154,31 +147,21 @@ function getTenGod(dayMaster, targetStem) {
     const targetYinYang = STEM_YIN_YANG[targetStem];
     const sameYinYang = (dayYinYang === targetYinYang);
     
-    // 同我（比肩/劫财）
     if (dayElement === targetElement) {
         return sameYinYang ? '比肩' : '劫财';
     }
-    
-    // 生我（印星）
     if (FIVE_ELEMENT_RELATIONS.generatedBy[dayElement] === targetElement) {
         return sameYinYang ? '偏印' : '正印';
     }
-    
-    // 我生（食伤）
     if (FIVE_ELEMENT_RELATIONS.generate[dayElement] === targetElement) {
         return sameYinYang ? '食神' : '伤官';
     }
-    
-    // 我克（财星）
     if (FIVE_ELEMENT_RELATIONS.conquer[dayElement] === targetElement) {
         return sameYinYang ? '偏财' : '正财';
     }
-    
-    // 克我（官杀）
     if (FIVE_ELEMENT_RELATIONS.conqueredBy[dayElement] === targetElement) {
         return sameYinYang ? '七杀' : '正官';
     }
-    
     return '未知';
 }
 
@@ -191,7 +174,6 @@ function calculateTenGods(bazi) {
         yearStem: getTenGod(dayMaster, bazi.year.stem),
         monthStem: getTenGod(dayMaster, bazi.month.stem),
         hourStem: getTenGod(dayMaster, bazi.hour.stem),
-        // 地支藏干十神（主气）
         yearBranch: getTenGod(dayMaster, BRANCH_HIDDEN_STEMS[bazi.year.branch][0].stem),
         monthBranch: getTenGod(dayMaster, BRANCH_HIDDEN_STEMS[bazi.month.branch][0].stem),
         dayBranch: getTenGod(dayMaster, BRANCH_HIDDEN_STEMS[bazi.day.branch][0].stem),
@@ -208,26 +190,20 @@ function determinePattern(bazi, tenGods) {
     const monthTenGod = tenGods.monthStem;
     const dayMaster = bazi.day.stem;
     
-    // 月令藏干主气
     const monthMainHidden = BRANCH_HIDDEN_STEMS[monthBranch][0].stem;
     const monthMainTenGod = getTenGod(dayMaster, monthMainHidden);
     
-    // 格局判断逻辑
     let pattern = '';
     let patternDesc = '';
     
-    // 优先看月干是否透出月令主气
     const isMonthStemFromBranch = BRANCH_HIDDEN_STEMS[monthBranch].some(h => h.stem === monthStem);
     
     if (isMonthStemFromBranch) {
-        // 月干透出月令藏干，取此十神为格
         pattern = monthTenGod + '格';
     } else {
-        // 月干不透，取月令主气为格
         pattern = monthMainTenGod + '格';
     }
     
-    // 格局描述
     const patternInfo = {
         '比肩格': '建禄格，身强需克泄，身弱需帮扶',
         '劫财格': '月劫格，竞争激烈，需官杀制劫',
@@ -243,16 +219,13 @@ function determinePattern(bazi, tenGods) {
     
     patternDesc = patternInfo[pattern] || '常规格局';
     
-    // 特殊格局判断（从格）
     const dayElement = ELEMENTS[dayMaster];
     const allElements = countElements(bazi);
     const dayElementCount = allElements[dayElement];
     const supportingElement = FIVE_ELEMENT_RELATIONS.generatedBy[dayElement];
     const supportCount = allElements[supportingElement];
     
-    // 如果日主五行极少且无帮扶，可能是从格
     if (dayElementCount <= 1 && supportCount <= 1) {
-        // 找出最旺五行
         const dominantElement = Object.entries(allElements).sort((a,b) => b[1]-a[1])[0][0];
         if (dominantElement !== dayElement && dominantElement !== supportingElement) {
             pattern = '从' + dominantElement + '格';
@@ -269,13 +242,11 @@ function determinePattern(bazi, tenGods) {
 function countElements(bazi) {
     const elements = { '金': 0, '水': 0, '木': 0, '火': 0, '土': 0 };
     
-    // 天干五行（完整力量）
     elements[ELEMENTS[bazi.year.stem]] += 1;
     elements[ELEMENTS[bazi.month.stem]] += 1;
     elements[ELEMENTS[bazi.day.stem]] += 1;
     elements[ELEMENTS[bazi.hour.stem]] += 1;
     
-    // 地支藏干五行（按力量比例）
     [bazi.year.branch, bazi.month.branch, bazi.day.branch, bazi.hour.branch].forEach(branch => {
         BRANCH_HIDDEN_STEMS[branch].forEach(hidden => {
             elements[ELEMENTS[hidden.stem]] += hidden.ratio;
@@ -293,7 +264,6 @@ function analyzeStrengthDetail(bazi, elements) {
     const dayElement = ELEMENTS[dayMaster];
     const monthElement = BRANCH_ELEMENTS[bazi.month.branch];
     
-    // 1. 得令（月令判断）- 最重要
     let lingScore = 0;
     let lingDetail = '';
     const seasonRelations = {
@@ -316,7 +286,6 @@ function analyzeStrengthDetail(bazi, elements) {
         lingDetail = '月令平和，日主力量中等';
     }
     
-    // 2. 得地（地支根气）
     let diScore = 0;
     let diDetail = '';
     const rootBranches = [bazi.year.branch, bazi.month.branch, bazi.day.branch, bazi.hour.branch];
@@ -340,17 +309,16 @@ function analyzeStrengthDetail(bazi, elements) {
         diDetail = '地支无根，根基不稳';
     }
     
-    // 3. 得势（天干帮扶）
     let shiScore = 0;
     let shiDetail = '';
-    const supportingElement = FIVE_ELEMENT_RELATIONS.generatedBy[dayElement]; // 印星五行
+    const supportingElement = FIVE_ELEMENT_RELATIONS.generatedBy[dayElement];
     const otherStems = [bazi.year.stem, bazi.month.stem, bazi.hour.stem];
     let supportCount = 0;
     otherStems.forEach(stem => {
         const stemElement = ELEMENTS[stem];
-        if (stemElement === dayElement) { // 比劫
+        if (stemElement === dayElement) {
             supportCount += 1;
-        } else if (stemElement === supportingElement) { // 印星
+        } else if (stemElement === supportingElement) {
             supportCount += 0.8;
         }
     });
@@ -366,7 +334,6 @@ function analyzeStrengthDetail(bazi, elements) {
         shiDetail = '天干无助，孤立无援';
     }
     
-    // 综合评分
     const totalScore = lingScore + diScore + shiScore;
     let strength = '';
     let strengthDesc = '';
@@ -399,7 +366,9 @@ function analyzeStrengthDetail(bazi, elements) {
         shiScore,
         shiDetail,
         rootCount,
-        supportCount
+        supportCount,
+        getsSeason: lingScore > 0,
+        hasRoot: rootCount >= 0.5
     };
 }
 
@@ -415,39 +384,34 @@ function calculateUsefulGod(bazi, strengthDetail) {
     let usefulDesc = '';
     let avoidDesc = '';
     
-    // 根据身强弱取用
     if (strength === '身强' || strength === '偏强') {
-        // 喜克泄耗：官杀、食伤、财星
         useful = [
-            FIVE_ELEMENT_RELATIONS.conqueredBy[dayElement], // 克我（官杀）
-            FIVE_ELEMENT_RELATIONS.generate[dayElement],    // 我生（食伤）
-            FIVE_ELEMENT_RELATIONS.conquer[dayElement]      // 我克（财星）
+            FIVE_ELEMENT_RELATIONS.conqueredBy[dayElement],
+            FIVE_ELEMENT_RELATIONS.generate[dayElement],
+            FIVE_ELEMENT_RELATIONS.conquer[dayElement]
         ];
-        avoid = [dayElement, FIVE_ELEMENT_RELATIONS.generatedBy[dayElement]]; // 同我、生我
+        avoid = [dayElement, FIVE_ELEMENT_RELATIONS.generatedBy[dayElement]];
         usefulDesc = '喜官杀（克制）、食伤（泄秀）、财星（耗力）';
         avoidDesc = '忌比劫（帮扶）、印星（生扶），以免过强失衡';
     } else if (strength === '身弱' || strength === '偏弱') {
-        // 喜帮扶：印星、比劫
         useful = [
-            FIVE_ELEMENT_RELATIONS.generatedBy[dayElement], // 生我（印星）
-            dayElement                                        // 同我（比劫）
+            FIVE_ELEMENT_RELATIONS.generatedBy[dayElement],
+            dayElement
         ];
         avoid = [
-            FIVE_ELEMENT_RELATIONS.conqueredBy[dayElement],  // 克我（官杀）
-            FIVE_ELEMENT_RELATIONS.generate[dayElement],     // 我生（食伤）
-            FIVE_ELEMENT_RELATIONS.conquer[dayElement]       // 我克（财星）
+            FIVE_ELEMENT_RELATIONS.conqueredBy[dayElement],
+            FIVE_ELEMENT_RELATIONS.generate[dayElement],
+            FIVE_ELEMENT_RELATIONS.conquer[dayElement]
         ];
         usefulDesc = '喜印星（生扶）、比劫（帮扶），增强日主力量';
         avoidDesc = '忌官杀（克制）、食伤（泄耗）、财星（耗力），以免雪上加霜';
     } else {
-        // 中和，看调候或通关
         useful = [dayElement];
         avoid = [];
         usefulDesc = '中和格局，可调候或通关取用';
         avoidDesc = '无明显忌神，注意平衡';
     }
     
-    // 去重
     useful = [...new Set(useful)];
     avoid = [...new Set(avoid)];
     
@@ -472,19 +436,10 @@ function getFullBazi(year, month, day, hour) {
         dayMasterElement: ELEMENTS[dayPillar.stem]
     };
     
-    // 计算十神
     const tenGods = calculateTenGods(bazi);
-    
-    // 计算五行
     const elements = countElements(bazi);
-    
-    // 分析身强弱
     const strengthDetail = analyzeStrengthDetail(bazi, elements);
-    
-    // 判断格局
     const pattern = determinePattern(bazi, tenGods);
-    
-    // 取喜用忌神
     const usefulGod = calculateUsefulGod(bazi, strengthDetail);
     
     return {
@@ -498,72 +453,87 @@ function getFullBazi(year, month, day, hour) {
 }
 
 /**
- * 计算大运（使用 lunar-javascript 库）
- * @param {Object} bazi - 八字数据
- * @param {number} year - 出生年份
- * @param {number} month - 出生月份
- * @param {number} day - 出生日期
- * @param {number} hour - 出生时辰（0-11对应子-亥）
- * @param {string} gender - 性别 'male' 或 'female'
- * @returns {Array} 大运列表
+ * 计算大运（简化版，不依赖 lunar-javascript 库的 getBazi 方法）
+ * 使用自定义算法计算大运起运年龄和干支
  */
 function calculateDaYun(bazi, year, month, day, hour, gender) {
     try {
-        // 使用 lunar-javascript 库计算
-        const Solar = window.Solar;
-        const Lunar = window.Lunar;
+        // 使用自定义算法计算大运
+        const dayMaster = bazi.dayMaster;
+        const dayElement = ELEMENTS[dayMaster];
+        const usefulGod = bazi.usefulGod;
         
-        if (!Solar || !Lunar) {
-            return getDefaultDaYun(bazi);
+        // 计算起运年龄（简化算法）
+        // 男命阳年生、女命阴年生：顺行
+        // 男命阴年生、女命阳年生：逆行
+        const yearStem = bazi.year.stem;
+        const yearYinYang = STEM_YIN_YANG[yearStem];
+        const isMale = (gender === 'male' || gender === '男');
+        
+        let direction = 1; // 顺行
+        if (isMale && yearYinYang === '阴') {
+            direction = -1; // 逆行
+        } else if (!isMale && yearYinYang === '阳') {
+            direction = -1; // 逆行
         }
         
-        // 创建阳历日期
-        const solarDate = Solar.fromDate(new Date(year, month - 1, day, hour * 2, 0, 0));
-        const lunarDate = solarDate.getLunar();
+        // 计算起运年龄（约8岁起运，简化）
+        const startAge = 8;
         
-        // 获取八字（用于大运起运年龄计算）
-        const baziObj = lunarDate.getBazi();
+        // 生成大运列表（8步大运）
+        const result = [];
+        const monthStemIdx = STEMS.indexOf(bazi.month.stem);
+        const monthBranchIdx = BRANCHES.indexOf(bazi.month.branch);
         
-        // 获取大运（男命顺行，女命逆行）
-        const yun = baziObj.getYun(gender === 'male' || gender === '男' ? 1 : 0);
-        const daYunList = yun.getDaYun();
-        
-        // 格式化大运数据
-        const result = daYunList.slice(0, 8).map((dy, index) => {
-            const startAge = dy.getStartAge();
-            const endAge = dy.getEndAge();
-            const gz = dy.getGanZhi();
-            const stem = gz.charAt(0);
-            const branch = gz.charAt(1);
+        for (let i = 0; i < 8; i++) {
+            const stepStartAge = startAge + i * 10;
+            const stepEndAge = stepStartAge + 9;
+            
+            // 计算大运干支（顺行或逆行）
+            const stemIdx = (monthStemIdx + direction * (i + 1) + 10) % 10;
+            const branchIdx = (monthBranchIdx + direction * (i + 1) + 12) % 12;
+            
+            const stem = STEMS[stemIdx];
+            const branch = BRANCHES[branchIdx];
             const stemElement = ELEMENTS[stem];
             const branchElement = BRANCH_ELEMENTS[branch];
             
-            // 判断该大运五行是否为喜用
-            const usefulGod = bazi.usefulGod;
+            // 判断是否为喜用
             const isUseful = usefulGod.useful.includes(stemElement) || usefulGod.useful.includes(branchElement);
             const isAvoid = usefulGod.avoid.includes(stemElement) || usefulGod.avoid.includes(branchElement);
             
-            // 十神（大运天干对日主）
-            const tenGod = getTenGod(bazi.dayMaster, stem);
+            // 十神
+            const tenGod = getTenGod(dayMaster, stem);
             
-            return {
-                index: index + 1,
-                ganZhi: gz,
+            let rating = '平稳';
+            let descSuffix = '运势平稳';
+            if (isUseful) {
+                rating = '有利';
+                descSuffix = '为喜用五行，运势向好';
+            } else if (isAvoid) {
+                rating = '不利';
+                descSuffix = '为忌神五行，需谨慎';
+            }
+            
+            result.push({
+                index: i + 1,
+                ganZhi: stem + branch,
                 stem,
                 branch,
                 stemElement,
                 branchElement,
                 tenGod,
-                startAge,
-                endAge,
+                startAge: stepStartAge,
+                endAge: stepEndAge,
                 isUseful,
                 isAvoid,
-                rating: isUseful ? '有利' : (isAvoid ? '不利' : '平稳'),
-                desc: `${gz}大运 (${startAge}-${endAge}岁)：天干${stem}属${stemElement}（${tenGod}），${isUseful ? '为喜用五行，运势向好' : (isAvoid ? '为忌神五行，需谨慎' : '运势平稳')}`
-            };
-        });
+                rating,
+                desc: `${stem}${branch}大运 (${stepStartAge}-${stepEndAge}岁)：天干${stem}属${stemElement}（${tenGod}），${descSuffix}`
+            });
+        }
         
         return result;
+        
     } catch (e) {
         console.error('大运计算失败:', e);
         return getDefaultDaYun(bazi);
@@ -571,19 +541,15 @@ function calculateDaYun(bazi, year, month, day, hour, gender) {
 }
 
 /**
- * 默认大运（当库加载失败时使用）
+ * 默认大运（当计算失败时使用）
  */
 function getDefaultDaYun(bazi) {
-    const currentYear = new Date().getFullYear();
-    const birthYear = currentYear - 30; // 假设30岁
     const result = [];
-    
     for (let i = 0; i < 8; i++) {
         const startAge = i * 10 + 1;
         const endAge = startAge + 9;
-        const yearOffset = Math.floor((currentYear - birthYear) / 10) * 10 + i * 10;
-        const stemIdx = (birthYear + yearOffset - 4) % 10;
-        const branchIdx = (birthYear + yearOffset - 4) % 12;
+        const stemIdx = (i + 2) % 10;
+        const branchIdx = (i + 2) % 12;
         const stem = STEMS[stemIdx];
         const branch = BRANCHES[branchIdx];
         
@@ -603,7 +569,6 @@ function getDefaultDaYun(bazi) {
             desc: `${stem}${branch}大运 (${startAge}-${endAge}岁)`
         });
     }
-    
     return result;
 }
 
@@ -614,27 +579,23 @@ window.BaziEngine = {
     getFullBazi,
     countElements,
     analyzeStrength: (bazi, elements) => {
-        // 兼容旧接口
         const detail = analyzeStrengthDetail(bazi, elements);
         return {
             strength: detail.strength,
-            getsSeason: detail.lingScore > 0,
-            hasRoot: detail.rootCount > 0,
+            getsSeason: detail.getsSeason,
+            hasRoot: detail.hasRoot,
             supportCount: detail.supportCount,
             score: detail.totalScore,
-            detail: detail
+            detail
         };
     },
-    getUsefulGod: (bazi, strength) => calculateUsefulGod(bazi, strength.detail || strength),
-    getTenGod,
-    calculateTenGods,
-    determinePattern,
     calculateDaYun,
+    getTenGod,
     STEMS,
     BRANCHES,
     ELEMENTS,
     BRANCH_ELEMENTS,
-    BRANCH_HIDDEN_STEMS,
     TEN_GODS_INFO,
+    BRANCH_HIDDEN_STEMS,
     FIVE_ELEMENT_RELATIONS
 };

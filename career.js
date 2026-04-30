@@ -1,7 +1,6 @@
 /**
  * 命理分析模块 - 专业版
  * 六维度分析：事业、财运、婚恋、子女、六亲、健康
- * 包含大运流年趋势预测
  */
 
 // 天干性格特质（详细版）
@@ -127,12 +126,10 @@ function analyzeDestiny(bazi, strengthDetail, elements, gender) {
     const pattern = bazi.pattern;
     const usefulGod = bazi.usefulGod;
     
-    // 性格特质
     const personality = STEM_PERSONALITY[dayMaster];
     
-    // 六维度分析
     const aspects = {
-        career: analyzeCareer(bazi, strengthDetail, tenGods, usefulGod, gender),
+        career: analyzeCareerAspect(bazi, strengthDetail, tenGods, usefulGod, gender),
         wealth: analyzeWealth(bazi, strengthDetail, tenGods, usefulGod),
         marriage: analyzeMarriage(bazi, strengthDetail, tenGods, gender),
         children: analyzeChildren(bazi, tenGods),
@@ -140,13 +137,8 @@ function analyzeDestiny(bazi, strengthDetail, elements, gender) {
         health: analyzeHealth(bazi, elements)
     };
     
-    // 开运指南
     const fortuneGuide = generateFortuneGuide(usefulGod, dayElement);
-    
-    // 流年趋势（未来5年）
     const futureTrend = analyzeFutureTrend(bazi, usefulGod);
-    
-    // 综合建议
     const suggestions = generateOverallSuggestions(bazi, strengthDetail, aspects, usefulGod);
     
     return {
@@ -161,13 +153,12 @@ function analyzeDestiny(bazi, strengthDetail, elements, gender) {
 }
 
 /**
- * 事业分析
+ * 事业分析（六维度用）
  */
-function analyzeCareer(bazi, strengthDetail, tenGods, usefulGod, gender) {
+function analyzeCareerAspect(bazi, strengthDetail, tenGods, usefulGod, gender) {
     const strength = strengthDetail.strength;
     const dayElement = ELEMENTS[bazi.dayMaster];
     
-    // 检查官杀印星情况
     const hasOfficer = tenGods.yearStem.includes('官') || tenGods.monthStem.includes('官') || tenGods.hourStem.includes('官');
     const hasSeal = tenGods.yearStem.includes('印') || tenGods.monthStem.includes('印') || tenGods.hourStem.includes('印');
     
@@ -197,7 +188,6 @@ function analyzeCareer(bazi, strengthDetail, tenGods, usefulGod, gender) {
         suitableJobs = ['创业者', '技术创新', '艺术家', '自由职业', '独立执业'];
         advice = '需控制情绪，避免与权威冲突，宜选择灵活性高的工作。';
     } else {
-        // 按五行旺衰
         const dominantElement = Object.entries(bazi.elements).sort((a,b) => b[1]-a[1])[0][0];
         careerType = dominantElement + '旺主导型';
         const careerInfo = ELEMENT_CAREERS[dominantElement];
@@ -206,7 +196,6 @@ function analyzeCareer(bazi, strengthDetail, tenGods, usefulGod, gender) {
         advice = `宜发挥${careerInfo.traits.join('、')}特质，选择五行属${dominantElement}的行业。`;
     }
     
-    // 身强弱调整
     if (strength === '身弱') {
         advice += ' 身弱不宜单打独斗，宜选择有团队支持的平台。';
         suitableJobs = suitableJobs.filter(j => !j.includes('创业'));
@@ -259,7 +248,6 @@ function analyzeWealth(bazi, strengthDetail, tenGods, usefulGod) {
         advice = '宜专注提升技能，靠实力求财，不宜投机。';
     }
     
-    // 身强弱影响
     if (strength === '身弱') {
         wealthLevel += '（身弱难担财）';
         advice += ' 身弱不宜追求大财，宜稳健为主，待运势帮扶再求进取。';
@@ -284,13 +272,11 @@ function analyzeMarriage(bazi, strengthDetail, tenGods, gender) {
     const dayBranch = bazi.day.branch;
     const dayBranchHidden = BRANCH_HIDDEN_STEMS[dayBranch];
     
-    // 婚姻宫（日支）分析
     let spouseTrait = '';
     let marriageAge = '';
     let marriageRisk = '';
     let advice = '';
     
-    // 日支藏干看配偶特质
     const spouseTenGod = getTenGod(bazi.dayMaster, dayBranchHidden[0].stem);
     if (spouseTenGod.includes('食')) {
         spouseTrait = '配偶温和、有才艺、喜欢享受，相貌清秀';
@@ -306,14 +292,12 @@ function analyzeMarriage(bazi, strengthDetail, tenGods, gender) {
         spouseTrait = '配偶特质需结合整体命盘分析';
     }
     
-    // 婚姻年龄倾向
     if (tenGods.yearStem.includes('财') || tenGods.yearStem.includes('官')) {
         marriageAge = '早婚倾向（25岁前）';
     } else {
         marriageAge = '晚婚更利（28岁后），早婚易波折';
     }
     
-    // 婚姻风险
     if (tenGods.hourStem.includes('伤')) {
         marriageRisk = '伤官透出，易有感情波折，需注意沟通';
     } else if (tenGods.yearStem.includes('劫')) {
@@ -328,8 +312,7 @@ function analyzeMarriage(bazi, strengthDetail, tenGods, gender) {
         spouseTrait,
         marriageAge,
         marriageRisk,
-        advice,
-        warning: '【术语解释】婚姻宫：日支代表配偶位置；伤官：易挑剔不满；劫财：易有竞争干扰。'
+        advice
     };
 }
 
@@ -337,32 +320,36 @@ function analyzeMarriage(bazi, strengthDetail, tenGods, gender) {
  * 子女分析
  */
 function analyzeChildren(bazi, tenGods) {
-    const hasFoodGod = tenGods.yearStem.includes('食') || tenGods.monthStem.includes('食') || tenGods.hourStem.includes('食');
-    const hasHurtOfficer = tenGods.yearStem.includes('伤') || tenGods.monthStem.includes('伤') || tenGods.hourStem.includes('伤');
+    const hasShi = tenGods.monthStem.includes('食') || tenGods.hourStem.includes('食');
+    const hasShang = tenGods.monthStem.includes('伤') || tenGods.hourStem.includes('伤');
     
-    let childrenTendency = '';
-    let firstChildGender = '';
-    let parentingAdvice = '';
+    let childrenInfo = '';
+    let childrenRelation = '';
+    let advice = '';
     
-    if (hasFoodGod) {
-        childrenTendency = '食神旺，与子女缘分深，子女性格温和';
-        firstChildGender = '头胎生女概率较高';
-        parentingAdvice = '宜宽松教育，培养子女才艺和兴趣';
-    } else if (hasHurtOfficer) {
-        childrenTendency = '伤官旺，子女聪明叛逆，需耐心教育';
-        firstChildGender = '头胎生男概率较高';
-        parentingAdvice = '宜引导而非压制，培养子女独立思考';
+    if (hasShi && hasShang) {
+        childrenInfo = '食伤双显，子女缘分浓厚，子女聪明有才华';
+        childrenRelation = '与子女关系良好，子女能带来成就感';
+        advice = '注意培养子女独立性，不宜过度宠溺。';
+    } else if (hasShi) {
+        childrenInfo = '食神显，子女温和听话，有才艺天赋';
+        childrenRelation = '与子女关系融洽，子女性格温和';
+        advice = '宜培养子女的艺术或技术特长。';
+    } else if (hasShang) {
+        childrenInfo = '伤官显，子女聪明叛逆，有创新精神';
+        childrenRelation = '与子女沟通需注意方式，子女个性较强';
+        advice = '宜尊重子女个性，引导而非控制。';
     } else {
-        childrenTendency = '子女缘分需结合大运分析';
-        firstChildGender = '不确定，需综合判断';
-        parentingAdvice = '宜用心经营亲子关系';
+        childrenInfo = '食伤不明显，子女缘分需看运势';
+        childrenRelation = '子女关系需后天培养';
+        advice = '可多行善积德，增进子女缘分。';
     }
     
     return {
-        tendency: childrenTendency,
-        firstChildGender,
-        parentingAdvice,
-        warning: '【术语解释】食神：代表子女（女命）、温和才华；伤官：代表子女（男命）、叛逆创新。'
+        info: childrenInfo,
+        relation: childrenRelation,
+        advice,
+        warning: '【术语解释】食神、伤官：代表子女星，食神温和，伤官叛逆。'
     };
 }
 
@@ -370,44 +357,40 @@ function analyzeChildren(bazi, tenGods) {
  * 六亲分析
  */
 function analyzeFamily(bazi, tenGods) {
-    const yearStem = tenGods.yearStem;
-    const monthStem = tenGods.monthStem;
+    const hasZhengYin = tenGods.yearStem.includes('印') || tenGods.monthStem.includes('印');
+    const hasPianYin = tenGods.yearStem.includes('枭') || tenGods.monthStem.includes('枭');
+    const hasBiJian = tenGods.yearStem.includes('比') || tenGods.hourStem.includes('比');
+    const hasJieCai = tenGods.yearStem.includes('劫') || tenGods.hourStem.includes('劫');
     
-    let fatherRelation = '';
-    let motherRelation = '';
-    let siblingRelation = '';
+    let motherInfo = '';
+    let siblingInfo = '';
+    let advice = '';
     
-    // 父亲（年柱偏财）
-    if (yearStem.includes('才')) {
-        fatherRelation = '年柱偏财，与父亲缘分一般，或父亲运势起伏较大';
-    } else if (yearStem.includes('财')) {
-        fatherRelation = '年柱正财，父亲务实稳重，关系较稳定';
+    if (hasZhengYin) {
+        motherInfo = '正印显，母亲缘分好，母亲为贵人';
+    } else if (hasPianYin) {
+        motherInfo = '偏印显，母亲关系需磨合，或有继母长辈';
     } else {
-        fatherRelation = '年柱无明显财星，父亲缘分需综合分析';
+        motherInfo = '印星不显，母亲缘分需后天培养';
     }
     
-    // 母亲（月柱印星）
-    if (monthStem.includes('印')) {
-        motherRelation = '月柱印星，与母亲缘分深，能得母亲关爱和支持';
-    } else if (monthStem.includes('枭')) {
-        motherRelation = '月柱偏印，与母亲关系复杂，或母亲性格独特';
+    if (hasBiJian && hasJieCai) {
+        siblingInfo = '比劫双显，兄弟姐妹多，有竞争也有互助';
+    } else if (hasBiJian) {
+        siblingInfo = '比肩显，兄弟姐妹关系平等互助';
+    } else if (hasJieCai) {
+        siblingInfo = '劫财显，兄弟姐妹有竞争，财物需注意';
     } else {
-        motherRelation = '月柱无明显印星，母亲缘分需综合分析';
+        siblingInfo = '比劫不显，兄弟姐妹缘分一般';
     }
     
-    // 兄弟姐妹（比劫）
-    const hasBrother = Object.values(tenGods).some(t => t.includes('比') || t.includes('劫'));
-    if (hasBrother) {
-        siblingRelation = '命带比劫，有兄弟姐妹缘分，但需注意财物竞争';
-    } else {
-        siblingRelation = '比劫不明显，兄弟姐妹缘分较淡';
-    }
+    advice = '六亲缘分各有不同，宜珍惜亲情，和睦相处。';
     
     return {
-        fatherRelation,
-        motherRelation,
-        siblingRelation,
-        warning: '【术语解释】年柱：代表父母、祖辈；月柱：代表父母、兄弟；比劫：代表兄弟姐妹。'
+        mother: motherInfo,
+        siblings: siblingInfo,
+        advice,
+        warning: '【术语解释】正印：母亲；偏印：继母或长辈；比肩：兄弟姐妹（互助）；劫财：兄弟姐妹（竞争）。'
     };
 }
 
@@ -415,26 +398,32 @@ function analyzeFamily(bazi, tenGods) {
  * 健康分析
  */
 function analyzeHealth(bazi, elements) {
-    const dominant = Object.entries(elements).sort((a,b) => b[1]-a[1])[0][0];
-    const weakest = Object.entries(elements).sort((a,b) => a[1]-b[1])[0][0];
+    const sortedElements = Object.entries(elements).sort((a,b) => b[1]-a[1]);
+    const dominant = sortedElements[0][0];
+    const weakest = sortedElements[sortedElements.length - 1][0];
     
-    // 五行与健康对应
-    const healthMap = {
-        '木': { organs: '肝胆、筋骨、眼睛', diseases: '肝病、胆结石、筋骨酸痛、近视' },
-        '火': { organs: '心脏、血液、小肠', diseases: '心血管问题、失眠、血压不稳' },
-        '土': { organs: '脾胃、消化系统', diseases: '胃病、消化不良、糖尿病' },
-        '金': { organs: '肺、大肠、皮肤', diseases: '呼吸系统问题、皮肤病、便秘' },
-        '水': { organs: '肾、膀胱、泌尿系统', diseases: '肾虚、泌尿问题、腰痛' }
+    let healthRisk = '';
+    let healthAdvice = '';
+    
+    const elementHealth = {
+        '木': { organ: '肝胆、筋骨、眼睛', risk: '易有肝胆不适、视力问题、关节疼痛' },
+        '火': { organ: '心脏、小肠、血脉', risk: '易有心血管问题、失眠、焦虑' },
+        '土': { organ: '脾胃、肌肉、消化', risk: '易有消化不良、胃病、肌肉酸痛' },
+        '金': { organ: '肺、大肠、皮肤', risk: '易有呼吸道问题、皮肤过敏、便秘' },
+        '水': { organ: '肾、膀胱、耳', risk: '易有泌尿问题、耳鸣、腰膝酸软' }
     };
     
-    const weakHealth = healthMap[weakest];
-    const strongHealth = healthMap[dominant];
+    healthRisk = `${dominant}旺：需注意${elementHealth[dominant].organ}，${elementHealth[dominant].risk}。`;
+    if (weakest !== dominant) {
+        healthRisk += ` ${weakest}弱：需补充${elementHealth[weakest].organ}养护。`;
+    }
+    
+    healthAdvice = '注意作息规律，适度运动，保持心情舒畅。';
     
     return {
-        weakOrgans: weakHealth.organs,
-        potentialDiseases: weakHealth.diseases,
-        advice: `五行${weakest}弱，需重点关注${weakHealth.organs}健康。建议定期体检，注意${weakHealth.diseases.split(',')[0]}的预防。`,
-        warning: '【术语解释】五行旺衰：某五行过弱，对应脏腑易有问题；过旺也可能导致失衡。'
+        risk: healthRisk,
+        advice: healthAdvice,
+        warning: '【术语解释】五行对应脏腑：木-肝、火-心、土-脾、金-肺、水-肾。'
     };
 }
 
@@ -442,32 +431,20 @@ function analyzeHealth(bazi, elements) {
  * 开运指南
  */
 function generateFortuneGuide(usefulGod, dayElement) {
-    const useful = usefulGod.useful;
-    const mainUseful = useful[0] || dayElement;
-    
-    const guide = {
-        '金': { direction: '西方、西北方', color: '白色、金色、银色', number: '4、9', item: '金银首饰、金属饰品', season: '秋季' },
-        '水': { direction: '北方', color: '黑色、蓝色', number: '1、6', item: '水晶、珍珠、水景', season: '冬季' },
-        '木': { direction: '东方、东南方', color: '绿色、青色', number: '3、8', item: '木质手串、绿植', season: '春季' },
-        '火': { direction: '南方', color: '红色、紫色、橙色', number: '2、7', item: '红宝石、电子设备', season: '夏季' },
-        '土': { direction: '中央、西南、东北', color: '黄色、棕色、咖啡色', number: '5、10', item: '玉石、陶瓷', season: '四季之交' }
-    };
-    
-    const g = guide[mainUseful];
+    const useful = usefulGod.useful[0] || dayElement;
+    const careerInfo = ELEMENT_CAREERS[useful];
     
     return {
-        element: mainUseful,
-        direction: g.direction,
-        color: g.color,
-        number: g.number,
-        item: g.item,
-        season: g.season,
-        explanation: `【开运原理】喜用神为${mainUseful}，通过方位、颜色、数字等五行属性增强运势。`
+        element: useful,
+        direction: careerInfo.direction,
+        color: careerInfo.color,
+        industries: careerInfo.industries.slice(0, 3),
+        traits: careerInfo.traits
     };
 }
 
 /**
- * 流年趋势分析（未来5年）
+ * 流年趋势（未来5年）
  */
 function analyzeFutureTrend(bazi, usefulGod) {
     const currentYear = new Date().getFullYear();
@@ -485,7 +462,6 @@ function analyzeFutureTrend(bazi, usefulGod) {
         const stemElement = ELEMENTS[stem];
         const branchElement = BRANCH_ELEMENTS[branch];
         
-        // 判断流年五行是否喜用
         const isUseful = useful.includes(stemElement) || useful.includes(branchElement);
         const isAvoid = avoid.includes(stemElement) || avoid.includes(branchElement);
         
@@ -533,22 +509,14 @@ function generateOverallSuggestions(bazi, strengthDetail, aspects, usefulGod) {
     
     const suggestions = [];
     
-    // 基于身强弱
     suggestions.push(`【命盘格局】${bazi.pattern.name}，${bazi.pattern.desc}`);
     suggestions.push(`【身强弱】${strength}（评分：${strengthDetail.totalScore}），${strengthDetail.strengthDesc}`);
     suggestions.push(`【喜用神】喜${useful}，${usefulGod.usefulDesc}`);
     suggestions.push(`【忌神】忌${avoid || '无明显忌神'}，${usefulGod.avoidDesc}`);
-    
-    // 事业建议
     suggestions.push(`【事业方向】${aspects.career.type}，${aspects.career.advice}`);
-    
-    // 财运建议
     suggestions.push(`【财运建议】${aspects.wealth.advice}`);
-    
-    // 健康建议
     suggestions.push(`【健康提醒】${aspects.health.advice}`);
     
-    // 发展方向
     const fortuneGuide = generateFortuneGuide(usefulGod, ELEMENTS[bazi.dayMaster]);
     suggestions.push(`【有利方位】${fortuneGuide.direction}，助力颜色${fortuneGuide.color}`);
     
@@ -556,9 +524,9 @@ function generateOverallSuggestions(bazi, strengthDetail, aspects, usefulGod) {
 }
 
 /**
- * 兼容旧接口的职业分析
+ * 兼容旧接口的职业分析（用于基础分析）
  */
-function analyzeCareer(bazi, strength, elements) {
+function analyzeCareerBasic(bazi, strength, elements) {
     const dayMaster = bazi.dayMaster;
     const personality = STEM_PERSONALITY[dayMaster];
     const dayElement = ELEMENTS[dayMaster];
@@ -599,7 +567,8 @@ function analyzeCareer(bazi, strength, elements) {
  */
 window.CareerEngine = {
     analyzeDestiny,
-    analyzeCareer,
+    analyzeCareer: analyzeCareerBasic,  // 兼容旧接口
+    analyzeCareerAspect,                 // 六维度用
     STEM_PERSONALITY,
     ELEMENT_CAREERS,
     TEN_GOD_ASPECTS
